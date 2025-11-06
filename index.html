@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genshin Impact</title>
+    <link rel="stylesheet" href="/src/styles.css">
+</head>
+<body>
+    <svg style="position: absolute; width: 0; height: 0;">
+        <defs>
+            <!-- 물결 파장 효과를 위한 필터 -->
+            <filter id="wave-filter" x="-50%" y="-50%" width="200%" height="200%">
+                <feTurbulence baseFrequency="0.015 0.03" numOctaves="3" seed="2" result="turbulence">
+                    <animate attributeName="baseFrequency" values="0.015 0.03;0.025 0.05;0.015 0.03" dur="2.5s" repeatCount="1"/>
+                </feTurbulence>
+                <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="5" xChannelSelector="R" yChannelSelector="G"/>
+            </filter>
+            <!-- 파장 효과를 위한 원형 필터 -->
+            <filter id="ripple-wave-filter" x="-100%" y="-100%" width="300%" height="300%">
+                <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur"/>
+                <feOffset in="blur" dx="0" dy="0" result="offsetBlur"/>
+                <feComponentTransfer>
+                    <feFuncA type="discrete" tableValues="0 0.5 0.8 0.5 0"/>
+                </feComponentTransfer>
+                <feMerge>
+                    <feMergeNode/>
+                    <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+            </filter>
+            <radialGradient id="ripple-gradient">
+                <stop offset="0%" stop-color="rgba(201, 169, 255, 0.6)" />
+                <stop offset="50%" stop-color="rgba(106, 90, 205, 0.3)" />
+                <stop offset="100%" stop-color="rgba(0, 0, 0, 0)" />
+            </radialGradient>
+        </defs>
+    </svg>
+    <div class="background" id="background">
+        <div class="starfield" id="starfield"></div>
+    </div>
+    <a href="https://genshin.hoyoverse.com/ko" target="_blank" class="title">
+        <div class="title-line title-main">Genshin</div>
+        <div class="title-line title-sub">Impact</div>
+    </a>
+
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>

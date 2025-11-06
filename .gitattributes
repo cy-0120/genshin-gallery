@@ -1,0 +1,20 @@
+# 줄바꿈 문자 정책 설정
+* text=auto
+
+# 소스 코드 파일은 LF로 정규화
+*.css text eol=lf
+*.js text eol=lf
+*.html text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+
+# 바이너리 파일은 그대로 유지
+*.ttf binary
+*.woff binary
+*.woff2 binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.svg binary
+

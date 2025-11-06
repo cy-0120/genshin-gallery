@@ -1,0 +1,619 @@
+/* CSS 변수 정의 */
+:root {
+    --color-primary: #c9a9ff;
+    --color-star: #ffd700;
+    --color-bg: #000000;
+    --color-purple-1: rgba(106, 90, 205, 0.6);
+    --color-purple-2: rgba(75, 0, 130, 0.5);
+    --color-purple-3: rgba(25, 25, 112, 0.4);
+    --color-purple-4: rgba(10, 10, 26, 0.3);
+    --color-purple-5: rgba(106, 90, 205, 0.4);
+    --color-ripple: rgba(255, 215, 0, 0.8);
+    --perspective-base: 1000px;
+    --perspective-star: 1200px;
+    --animation-duration-wave: 2.2s;
+    --animation-duration-ripple: 1s;
+    --animation-duration-sparkle: 0.6s;
+    --animation-duration-twinkle: 3s;
+    --click-x: 50%;
+    --click-y: 50%;
+}
+
+/* Liana 폰트 */
+@font-face {
+    font-family: 'Liana';
+    src: url('../fonts/Liana.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+    background: var(--color-bg);
+    cursor: pointer;
+}
+
+/* 배경 레이어 */
+.background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 20% 30%, var(--color-purple-1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, var(--color-purple-2) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, var(--color-purple-3) 0%, transparent 60%),
+        radial-gradient(circle at 10% 80%, var(--color-purple-4) 0%, transparent 40%),
+        radial-gradient(circle at 90% 20%, var(--color-purple-5) 0%, transparent 45%),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.8) 100%),
+        var(--color-bg);
+    transform-style: preserve-3d;
+    perspective: var(--perspective-base);
+    transform: perspective(var(--perspective-base)) translateZ(0);
+    transform-origin: 50% 50%; /* 기본값으로 설정 */
+    filter: none;
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+.background.wave {
+    will-change: transform, filter;
+    /* GPU 레이어 강제 생성 */
+    transform: perspective(var(--perspective-base)) translateZ(0);
+}
+
+.background:not(.wave) {
+    transition: none;
+    will-change: auto;
+}
+
+/* 배경 물 파동 효과 레이어 */
+.background-wave {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0;
+    transform-origin: var(--click-x, 50%) var(--click-y, 50%);
+    background: 
+        radial-gradient(circle at 20% 30%, var(--color-purple-1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, var(--color-purple-2) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, var(--color-purple-3) 0%, transparent 60%),
+        radial-gradient(circle at 10% 80%, var(--color-purple-4) 0%, transparent 40%),
+        radial-gradient(circle at 90% 20%, var(--color-purple-5) 0%, transparent 45%),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.8) 100%),
+        var(--color-bg);
+    filter: url(#wave-filter);
+    animation: water-ripple-effect 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    mix-blend-mode: screen;
+}
+
+.background-wave.active {
+    opacity: 1;
+}
+
+/* 클릭 위치 중심 물 파동 애니메이션 */
+@keyframes water-ripple-effect {
+    0% {
+        transform: perspective(var(--perspective-base)) translateZ(0) scale(0);
+        opacity: 1;
+        filter: url(#wave-filter) brightness(1);
+    }
+    20% {
+        transform: perspective(var(--perspective-base)) translateZ(-5px) scale(0.3);
+        opacity: 0.9;
+        filter: url(#wave-filter) brightness(1.1);
+    }
+    40% {
+        transform: perspective(var(--perspective-base)) translateZ(-8px) scale(0.6);
+        opacity: 0.7;
+        filter: url(#wave-filter) brightness(1.2);
+    }
+    60% {
+        transform: perspective(var(--perspective-base)) translateZ(-6px) scale(0.8);
+        opacity: 0.5;
+        filter: url(#wave-filter) brightness(1.1);
+    }
+    75% {
+        transform: perspective(var(--perspective-base)) translateZ(-4px) scale(0.95);
+        opacity: 0.3;
+        filter: url(#wave-filter) brightness(1.05);
+    }
+    85% {
+        transform: perspective(var(--perspective-base)) translateZ(-2px) scale(0.98);
+        opacity: 0.2;
+        filter: url(#wave-filter) brightness(1.02);
+    }
+    92% {
+        transform: perspective(var(--perspective-base)) translateZ(-0.5px) scale(0.99);
+        opacity: 0.1;
+        filter: url(#wave-filter) brightness(1.01);
+    }
+    99% {
+        transform: perspective(var(--perspective-base)) translateZ(-0.05px) scale(0.999);
+        opacity: 0.05;
+        filter: url(#wave-filter) brightness(1.005);
+    }
+    100% {
+        transform: perspective(var(--perspective-base)) translateZ(0) scale(1);
+        opacity: 0;
+        filter: none;
+    }
+}
+
+/* 별바다 배경 */
+.starfield {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    transform: perspective(var(--perspective-star)) translateZ(0) rotateX(0deg);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+.starfield.wave {
+    animation: starfield-water-wave var(--animation-duration-wave) cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    transform-origin: var(--click-x, 50%) var(--click-y, 50%);
+    will-change: transform;
+    /* GPU 레이어 강제 생성 */
+    transform: perspective(var(--perspective-star)) translateZ(0) rotateX(0deg);
+}
+
+.starfield:not(.wave) {
+    will-change: auto;
+    transition: none;
+    /* GPU 레이어 유지 */
+    transform: perspective(var(--perspective-star)) translateZ(0) rotateX(0deg);
+}
+
+.star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: var(--color-star);
+    border-radius: 50%;
+    box-shadow: 0 0 6px var(--color-star), 0 0 12px var(--color-star);
+    animation: twinkle var(--animation-duration-twinkle) infinite;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    /* GPU 가속 최적화 - 기본값에서는 will-change 제거 */
+    contain: layout style paint;
+}
+
+.star:not(.sparkle) {
+    will-change: auto;
+}
+
+.star.large {
+    width: 3px;
+    height: 3px;
+    box-shadow: 0 0 8px var(--color-star), 0 0 16px var(--color-star), 0 0 24px var(--color-star);
+}
+
+.star.medium {
+    width: 2.5px;
+    height: 2.5px;
+    box-shadow: 0 0 7px var(--color-star), 0 0 14px var(--color-star);
+}
+
+@keyframes twinkle {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.3;
+        transform: scale(0.8);
+    }
+}
+
+/* 별 반짝임 효과 - 파동과 겹칠 때 (파동 굴곡과 만나는 점) */
+.star.sparkle {
+    animation: sparkle var(--animation-duration-sparkle) ease-out;
+    z-index: 5;
+    will-change: transform, opacity, box-shadow;
+    /* GPU 가속 강화 */
+    transform: translateZ(0) scale(1);
+}
+
+@keyframes sparkle {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+        box-shadow: 
+            0 0 6px var(--color-star), 
+            0 0 12px var(--color-star);
+    }
+    20% {
+        opacity: 1;
+        transform: scale(2);
+        box-shadow: 
+            0 0 20px var(--color-star), 
+            0 0 40px var(--color-star),
+            0 0 60px var(--color-star);
+    }
+    40% {
+        opacity: 1;
+        transform: scale(1.5);
+        box-shadow: 
+            0 0 15px var(--color-star), 
+            0 0 30px var(--color-star),
+            0 0 45px var(--color-star);
+    }
+    60% {
+        opacity: 1;
+        transform: scale(1.2);
+        box-shadow: 
+            0 0 10px var(--color-star), 
+            0 0 20px var(--color-star);
+    }
+    80% {
+        opacity: 0.9;
+        transform: scale(1.1);
+        box-shadow: 
+            0 0 8px var(--color-star), 
+            0 0 16px var(--color-star);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+        box-shadow: 
+            0 0 6px var(--color-star), 
+            0 0 12px var(--color-star);
+    }
+}
+
+.star.large.sparkle {
+    animation: sparkle-large var(--animation-duration-sparkle) ease-out;
+}
+
+@keyframes sparkle-large {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+        box-shadow: 
+            0 0 8px var(--color-star), 
+            0 0 16px var(--color-star), 
+            0 0 24px var(--color-star);
+    }
+    20% {
+        opacity: 1;
+        transform: scale(2.5);
+        box-shadow: 
+            0 0 25px var(--color-star), 
+            0 0 50px var(--color-star),
+            0 0 75px var(--color-star),
+            0 0 100px var(--color-star);
+    }
+    40% {
+        opacity: 1;
+        transform: scale(1.8);
+        box-shadow: 
+            0 0 20px var(--color-star), 
+            0 0 40px var(--color-star),
+            0 0 60px var(--color-star);
+    }
+    60% {
+        opacity: 1;
+        transform: scale(1.4);
+        box-shadow: 
+            0 0 12px var(--color-star), 
+            0 0 24px var(--color-star),
+            0 0 36px var(--color-star);
+    }
+    80% {
+        opacity: 0.9;
+        transform: scale(1.15);
+        box-shadow: 
+            0 0 10px var(--color-star), 
+            0 0 20px var(--color-star);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+        box-shadow: 
+            0 0 8px var(--color-star), 
+            0 0 16px var(--color-star), 
+            0 0 24px var(--color-star);
+    }
+}
+
+.star.medium.sparkle {
+    animation: sparkle-medium var(--animation-duration-sparkle) ease-out;
+}
+
+@keyframes sparkle-medium {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+        box-shadow: 
+            0 0 7px var(--color-star), 
+            0 0 14px var(--color-star);
+    }
+    20% {
+        opacity: 1;
+        transform: scale(2.2);
+        box-shadow: 
+            0 0 22px var(--color-star), 
+            0 0 44px var(--color-star),
+            0 0 66px var(--color-star);
+    }
+    40% {
+        opacity: 1;
+        transform: scale(1.6);
+        box-shadow: 
+            0 0 18px var(--color-star), 
+            0 0 36px var(--color-star),
+            0 0 54px var(--color-star);
+    }
+    60% {
+        opacity: 1;
+        transform: scale(1.3);
+        box-shadow: 
+            0 0 11px var(--color-star), 
+            0 0 22px var(--color-star);
+    }
+    80% {
+        opacity: 0.9;
+        transform: scale(1.12);
+        box-shadow: 
+            0 0 9px var(--color-star), 
+            0 0 18px var(--color-star);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+        box-shadow: 
+            0 0 7px var(--color-star), 
+            0 0 14px var(--color-star);
+    }
+}
+
+/* 중앙 텍스트 */
+.title {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    text-decoration: none;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.title:hover {
+    opacity: 0.9;
+}
+
+.title-line {
+    font-family: 'Liana', serif;
+    font-weight: normal;
+    color: var(--color-primary);
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.title-main {
+    font-size: 70px;
+    letter-spacing: 4px;
+}
+
+.title-sub {
+    font-size: 48px;
+    letter-spacing: 3px;
+}
+
+/* Ripple 효과 - 물방울 떨어뜨리는 느낌 */
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid var(--color-ripple);
+    background: transparent;
+    pointer-events: none;
+    transform: translate(-50%, -50%) translateZ(0);
+    animation: ripple-animation var(--animation-duration-ripple) ease-out forwards;
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+.ripple::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 215, 0, 0.5);
+    animation: ripple-inner var(--animation-duration-ripple) ease-out 0.1s forwards;
+}
+
+.ripple::after { 
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    animation: ripple-outer var(--animation-duration-ripple) ease-out 0.2s forwards;
+}
+
+@keyframes ripple-animation {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 1;
+        border-width: 3px;
+    }
+    50% {
+        opacity: 0.8;
+        border-width: 2px;
+    }
+    100% {
+        width: 1200px;
+        height: 1200px;
+        opacity: 0;
+        border-width: 1px;
+    }
+}
+
+@keyframes ripple-inner {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 0.8;
+    }
+    100% {
+        width: 800px;
+        height: 800px;
+        opacity: 0;
+    }
+}
+
+@keyframes ripple-outer {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 0.6;
+    }
+    100% {
+        width: 1600px;
+        height: 1600px;
+        opacity: 0;
+    }
+}
+
+/* 물결 파장 레이어 (성능 최적화 - transform만 사용) */
+.wave-layer {
+    position: absolute;
+    /* 고정 크기 설정 */
+    width: var(--max-size, 2000px);
+    height: var(--max-size, 2000px);
+    /* transform만 사용 - GPU 레이어 생성 */
+    transform: translate(-50%, -50%) translateZ(0) scale(0);
+    pointer-events: none;
+    border-radius: 50%;
+    /* 그라데이션 단순화 (색상 강도 감소) */
+    background: radial-gradient(
+        circle,
+        rgba(201, 169, 255, 0.2) 0%,
+        rgba(201, 169, 255, 0.15) 20%,
+        rgba(106, 90, 205, 0.1) 40%,
+        transparent 65%
+    );
+    border: 1.5px solid rgba(201, 169, 255, 0.25);
+    /* filter 제거 (성능 최적화) - 굴곡은 배경에서만 적용 */
+    animation: wave-ripple-expand var(--animation-duration-wave) ease-out forwards;
+    z-index: 1;
+    /* box-shadow 단순화 (색상 강도 감소) */
+    box-shadow: 0 0 20px rgba(201, 169, 255, 0.15);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    /* GPU 가속 최적화 - transform과 opacity만 변경 */
+    will-change: transform, opacity;
+    /* 렌더링 최적화 */
+    contain: strict;
+    isolation: isolate;
+    /* 하드웨어 가속 강제 */
+    -webkit-transform: translate(-50%, -50%) translateZ(0) scale(0);
+}
+
+@keyframes wave-ripple-expand {
+    0% {
+        opacity: 0.8;
+        transform: translate(-50%, -50%) translateZ(0) scale(0);
+        border-width: 1.5px;
+    }
+    33% {
+        opacity: 0.6;
+        transform: translate(-50%, -50%) translateZ(0) scale(0.5);
+        border-width: 1px;
+    }
+    66% {
+        opacity: 0.4;
+        transform: translate(-50%, -50%) translateZ(0) scale(1.0);
+        border-width: 0.5px;
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) translateZ(0) scale(1.5);
+        border-width: 0px;
+    }
+}
+
+
+/* 배경 물결 파동 효과 - 입체적인 물결 (클릭 위치 중심) */
+.background.wave {
+    animation: water-wave var(--animation-duration-wave) cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    will-change: transform, filter;
+    /* 클릭 위치를 중심으로 transform-origin 설정 */
+    transform-origin: var(--click-x, 50%) var(--click-y, 50%);
+    /* GPU 레이어 강제 생성 */
+    transform: perspective(var(--perspective-base)) translateZ(0);
+}
+
+.background:not(.wave) {
+    will-change: auto;
+}
+
+@keyframes water-wave {
+    0% {
+        filter: url(#wave-filter);
+        transform: perspective(var(--perspective-base)) translateZ(0);
+    }
+    33% {
+        filter: url(#wave-filter);
+        transform: perspective(var(--perspective-base)) translateZ(-7px);
+    }
+    66% {
+        filter: url(#wave-filter);
+        transform: perspective(var(--perspective-base)) translateZ(-10px);
+    }
+    100% {
+        filter: none;
+        transform: perspective(var(--perspective-base)) translateZ(0);
+    }
+}
+
+@keyframes starfield-water-wave {
+    0% {
+        transform: perspective(var(--perspective-star)) translateZ(0) rotateX(0deg);
+    }
+    33% {
+        transform: perspective(var(--perspective-star)) translateZ(-4px) rotateX(0.6deg);
+    }
+    66% {
+        transform: perspective(var(--perspective-star)) translateZ(-5px) rotateX(0.8deg);
+    }
+    100% {
+        transform: perspective(var(--perspective-star)) translateZ(0) rotateX(0deg);
+    }
+}
+
