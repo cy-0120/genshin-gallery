@@ -352,10 +352,8 @@ let preloadedImages = new Map(); // 프리로드된 이미지 캐시
 // 이미지 목록 초기화 (img 폴더의 이미지들)
 // 실제 이미지 파일명에 맞게 수정 필요
 function initializeImageList() {
-    // img 폴더의 이미지 파일 목록
-    // 실제 파일명에 맞게 수정하세요
     imageList = [
-        '/img/qiqi-ice.jpg',
+        'src/img/qiqi-ice.jpg',
         // 추가 이미지가 있다면 여기에 추가
         // '/img/image2.jpg',
         // '/img/image3.jpg',
