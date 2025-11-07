@@ -1,16 +1,16 @@
 // CSS 파일 import
 import './styles.css';
 
-// 별 데이터 저장 (성능 최적화)
+// 별 데이터 저장
 const starData = [];
 
-// 프레임 레이트 모니터링 및 성능 최적화
+// 프레임 레이트 모니터링
 class PerformanceMonitor {
     constructor() {
         this.frameCount = 0;
         this.lastTime = performance.now();
         this.fps = 60;
-        this.adaptiveInterval = 200; // 기본 체크 간격 증가 (성능 최적화)
+        this.adaptiveInterval = 200; // 기본 체크 간격 증가
     }
     
     update() {
@@ -23,7 +23,7 @@ class PerformanceMonitor {
             this.frameCount = 0;
             this.lastTime = currentTime;
             
-            // FPS에 따라 체크 간격 조절 (성능 최적화 - 더 적극적으로)
+            // FPS에 따라 체크 간격 조절
             if (this.fps < 30) {
                 this.adaptiveInterval = 300; // 낮은 FPS일 때 간격 대폭 증가
             } else if (this.fps < 45) {
@@ -45,10 +45,10 @@ class PerformanceMonitor {
 
 const performanceMonitor = new PerformanceMonitor();
 
-// 별 생성 (성능 최적화 - DocumentFragment 사용)
+// 별 생성 
 function createStars() {
     const starfield = document.getElementById('starfield');
-    const starCount = 200;
+    const starCount = 175; 
     
     // DocumentFragment 사용하여 DOM 조작 최소화
     const fragment = document.createDocumentFragment();
@@ -75,7 +75,7 @@ function createStars() {
         star.style.animationDelay = Math.random() * 3 + 's';
         star.style.animationDuration = (Math.random() * 2 + 2) + 's';
         
-        // 별 데이터 저장 (성능 최적화)
+        // 별 데이터 저장
         starData.push({
             element: star,
             leftPercent: left,
@@ -85,11 +85,11 @@ function createStars() {
         fragment.appendChild(star);
     }
     
-    // 한 번에 모든 별 추가 (성능 최적화)
+    // 한 번에 모든 별 추가
     starfield.appendChild(fragment);
 }
 
-// 별 반짝임 체크 함수 (성능 최적화 - 최적화된 계산)
+// 별 반짝임 체크 함수
 function checkStarsInRipple(clickX, clickY, currentRadius, maxRadius) {
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
@@ -103,18 +103,18 @@ function checkStarsInRipple(clickX, clickY, currentRadius, maxRadius) {
     const clickYPercent = (clickY / windowHeight) * 100;
     
     // 파동의 가장자리 근처에 있는 별 감지 (파동 굴곡과 만나는 지점)
-    const waveThickness = maxDimension * 0.05; // 파동 두께 (화면의 5%)
+    const waveThickness = maxDimension * 0.06; // 파동 두께 증가 (5% → 6% - 더 넓은 범위로 체크 빈도 감소)
     const innerRadius = currentRadius - waveThickness;
     const outerRadius = currentRadius + waveThickness;
     
-    // 퍼센트 단위로 반경 계산 (성능 최적화)
+    // 퍼센트 단위로 반경 계산
     const innerRadiusPercent = innerRadius / maxDimensionPercent;
     const outerRadiusPercent = outerRadius / maxDimensionPercent;
     
     // 배치 처리로 DOM 조작 최소화
     const starsToSparkle = [];
     
-    // 별 데이터를 사용하여 계산 (성능 최적화)
+    // 별 데이터를 사용하여 계산
     for (let i = 0; i < starData.length; i++) {
         const starInfo = starData[i];
         const star = starInfo.element;
@@ -137,7 +137,7 @@ function checkStarsInRipple(clickX, clickY, currentRadius, maxRadius) {
         }
     }
     
-    // 배치로 한 번에 처리 (성능 최적화)
+    // 배치로 한 번에 처리
     if (starsToSparkle.length > 0) {
         starsToSparkle.forEach(star => {
             star.classList.add('sparkle');
@@ -147,17 +147,17 @@ function checkStarsInRipple(clickX, clickY, currentRadius, maxRadius) {
                 if (star.classList.contains('sparkle')) {
                     star.classList.remove('sparkle');
                 }
-            }, 600);
+            }, 600); // 500ms → 600ms (애니메이션 시간과 일치)
         });
     }
 }
 
-// 클릭 중복 방지 (성능 최적화)
+// 클릭 중복 방지
 let isAnimating = false;
 
 // Ripple 효과 생성 - 물방울 떨어뜨리는 느낌
 function createRipple(event) {
-    // 애니메이션 중이면 무시 (성능 최적화)
+    // 애니메이션 중이면 무시
     if (isAnimating) return;
     
     isAnimating = true;
@@ -188,12 +188,12 @@ function createRipple(event) {
     document.documentElement.style.setProperty('--click-x', clickXPercent + '%');
     document.documentElement.style.setProperty('--click-y', clickYPercent + '%');
     
-    // 물결 파장 레이어 생성 (효과 강화: 2개 생성 + 성능 최적화)
+    // 물결 파장 레이어 생성
     const maxDimension = Math.max(windowWidth, windowHeight);
-    const waveCount = 2; // 파장 개수 2개 (시각적 효과 강화)
+    const waveCount = 1; // 파장 개수 1개
     const maxSize = maxDimension * 2;
     
-    // DocumentFragment 사용하여 DOM 조작 최소화 (성능 최적화)
+    // DocumentFragment 사용하여 DOM 조작 최소화
     const fragment = document.createDocumentFragment();
     
     for (let i = 0; i < waveCount; i++) {
@@ -202,7 +202,7 @@ function createRipple(event) {
         waveLayer.style.left = clickXPercent + '%';
         waveLayer.style.top = clickYPercent + '%';
         waveLayer.style.animationDelay = (i * 0.4) + 's'; // 파장 순차 생성
-        // 직접 픽셀 값 설정 (calc() 대신 - 성능 최적화)
+        // 직접 픽셀 값 설정 (calc() 대신)
         waveLayer.style.setProperty('--max-size', maxSize + 'px');
         // transform은 CSS에서 처리하므로 여기서는 제거
         fragment.appendChild(waveLayer);
@@ -212,10 +212,10 @@ function createRipple(event) {
             if (waveLayer.parentNode) {
                 waveLayer.remove();
             }
-        }, 2300 + (i * 400));
+        }, 2100);
     }
     
-    // 한 번에 모든 요소 추가 (성능 최적화)
+    // 한 번에 모든 요소 추가
     background.appendChild(fragment);
     
     // 기존 wave 클래스 제거 (중복 방지)
@@ -229,9 +229,9 @@ function createRipple(event) {
     background.classList.add('wave');
     starfield.classList.add('wave');
     
-    // 별 반짝임 효과 - 파동이 퍼져나가는 동안 (성능 최적화)
+    // 별 반짝임 효과 - 파동이 퍼져나가는 동안
     const maxRadius = Math.max(windowWidth, windowHeight) * 1.5;
-    const totalDuration = 2300; // 애니메이션 시간 단축 (성능 최적화)
+    const totalDuration = 2100; // 애니메이션 시간 조정 (2200 → 2100, CSS와 동기화)
     const startTime = performance.now();
     let animationFrameId = null;
     let lastCheckTime = 0;
@@ -256,11 +256,11 @@ function createRipple(event) {
             
             // 적응형 체크 간격 사용 (성능에 따라 자동 조절)
             if (currentTime - lastCheckTime >= adaptiveInterval) {
-                const progress = elapsed / totalDuration; // Math.min 제거 (성능 최적화)
+                const progress = elapsed / totalDuration; // Math.min 제거
                 const currentRadius = maxRadius * progress;
                 
-                // 프레임 드롭 감지 시 별 체크 건너뛰기 (더 적극적으로)
-                const shouldCheck = performanceMonitor.fps >= 40 || frameSkipCount % 4 === 0;
+                // 프레임 드롭 감지 시 별 체크 건너뛰기 (더 적극적으로 - 5프레임마다 체크)
+                const shouldCheck = performanceMonitor.fps >= 45 || frameSkipCount % 5 === 0;
                 if (shouldCheck) {
                     checkStarsInRipple(x, y, currentRadius, maxRadius);
                     frameSkipCount = 0;
@@ -283,7 +283,7 @@ function createRipple(event) {
     
     animationFrameId = requestAnimationFrame(animateSparkle);
     
-    // 애니메이션 종료 감지 함수 (성능 최적화)
+    // 애니메이션 종료 감지 함수
     const handleAnimationEnd = () => {
         background.removeEventListener('animationend', handleAnimationEnd);
         starfield.removeEventListener('animationend', handleStarfieldEnd);
@@ -340,9 +340,271 @@ function createRipple(event) {
     handleAnimationEnd.cleanupTimer = cleanupTimer;
 }
 
-// 이벤트 리스너 (성능 최적화 - passive 옵션)
-document.addEventListener('click', createRipple, { passive: true });
+// 이미지 갤러리 관련 변수
+let isGalleryMode = false;
+let imageList = []; // 이미지 목록 (img 폴더의 이미지들)
+let currentImageIndex = 0;
+let usedImages = []; // 사용된 이미지 추적
+let galleryTimeout = null;
+let imageContainer = null; // 이미지 컨테이너 캐싱
+let preloadedImages = new Map(); // 프리로드된 이미지 캐시
+
+// 이미지 목록 초기화 (img 폴더의 이미지들)
+// 실제 이미지 파일명에 맞게 수정 필요
+function initializeImageList() {
+    // img 폴더의 이미지 파일 목록
+    // 실제 파일명에 맞게 수정하세요
+    imageList = [
+        '/img/qiqi-ice.jpg',
+        // 추가 이미지가 있다면 여기에 추가
+        // '/img/image2.jpg',
+        // '/img/image3.jpg',
+    ];
+}
+
+// 더블 클릭 감지
+let lastClickTime = 0;
+let clickTimeout = null;
+const DOUBLE_CLICK_DELAY = 300; // 더블 클릭 감지 시간 (ms)
+
+function handleDoubleClick(event) {
+    const currentTime = performance.now(); // Date.now() 대신 performance.now() 사용
+    
+    // 더블 클릭 감지 (300ms 이내)
+    if (currentTime - lastClickTime < DOUBLE_CLICK_DELAY) {
+        if (clickTimeout) {
+            clearTimeout(clickTimeout);
+            clickTimeout = null;
+        }
+        startImageGallery(event);
+        lastClickTime = 0; // 더블 클릭 처리 후 리셋
+    } else {
+        lastClickTime = currentTime;
+        if (clickTimeout) {
+            clearTimeout(clickTimeout);
+        }
+        clickTimeout = setTimeout(() => {
+            // 단일 클릭 처리
+            createRipple(event);
+            clickTimeout = null;
+        }, DOUBLE_CLICK_DELAY);
+    }
+}
+
+// 이미지 프리로드
+function preloadImage(src) {
+    if (preloadedImages.has(src)) {
+        return Promise.resolve(preloadedImages.get(src));
+    }
+    
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+            preloadedImages.set(src, img);
+            resolve(img);
+        };
+        img.onerror = reject;
+        img.src = src;
+    });
+}
+
+// 이미지 갤러리 시작
+function startImageGallery(event) {
+    if (isGalleryMode) return; // 이미 갤러리 모드면 무시
+    
+    isGalleryMode = true;
+    const x = event.clientX;
+    const y = event.clientY;
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    
+    // 클릭 위치를 퍼센트로 변환 (한 번만 계산)
+    const clickXPercent = (x / windowWidth) * 100;
+    const clickYPercent = (y / windowHeight) * 100;
+    
+    // CSS 변수 설정 (배치 처리)
+    const root = document.documentElement;
+    root.style.setProperty('--gallery-click-x', clickXPercent + '%');
+    root.style.setProperty('--gallery-click-y', clickYPercent + '%');
+    
+    // 원형 마스크 애니메이션 시작
+    const body = document.body;
+    body.classList.add('gallery-mode');
+    
+    // 이미지 목록이 비어있으면 초기화
+    if (imageList.length === 0) {
+        initializeImageList();
+    }
+    
+    // 사용된 이미지 초기화
+    usedImages = [];
+    
+    // 이미지 프리로드 시작
+    if (imageList.length > 0) {
+        imageList.forEach(imgSrc => {
+            preloadImage(imgSrc).catch(() => {
+                // 이미지 로드 실패 시 무시
+            });
+        });
+    }
+    
+    // 첫 번째 이미지 표시 (requestAnimationFrame 사용)
+    requestAnimationFrame(() => {
+        setTimeout(() => {
+            showNextImage();
+        }, 800); // 마스크 애니메이션 완료 후 이미지 표시
+    });
+}
+
+// 다음 이미지 표시
+function showNextImage() {
+    if (!isGalleryMode) return;
+    
+    // 사용 가능한 이미지가 없으면 원래 페이지로 복귀
+    if (usedImages.length >= imageList.length) {
+        returnToMainPage();
+        return;
+    }
+    
+    // 사용되지 않은 이미지 중 랜덤 선택 (filter 대신 직접 계산)
+    const availableCount = imageList.length - usedImages.length;
+    if (availableCount === 0) {
+        returnToMainPage();
+        return;
+    }
+    
+    let randomIndex;
+    let selectedImage;
+    let attempts = 0;
+    const maxAttempts = 100; // 무한 루프 방지
+    
+    // 중복되지 않는 이미지 선택
+    do {
+        randomIndex = Math.floor(Math.random() * imageList.length);
+        selectedImage = imageList[randomIndex];
+        attempts++;
+    } while (usedImages.includes(selectedImage) && attempts < maxAttempts);
+    
+    // 사용된 이미지 목록에 추가
+    usedImages.push(selectedImage);
+    currentImageIndex = usedImages.length - 1;
+    
+    // 이미지 컨테이너 생성 또는 업데이트 (캐싱 활용)
+    if (!imageContainer) {
+        imageContainer = document.createElement('div');
+        imageContainer.id = 'gallery-image-container';
+        imageContainer.className = 'gallery-image-container';
+        document.body.appendChild(imageContainer);
+    }
+    
+    // 프리로드된 이미지 사용 또는 새로 로드
+    const preloadedImg = preloadedImages.get(selectedImage);
+    
+    if (preloadedImg && preloadedImg.complete) {
+        // 프리로드된 이미지 사용
+        displayImage(selectedImage, preloadedImg);
+    } else {
+        // 이미지 로드 후 표시
+        preloadImage(selectedImage).then((img) => {
+            if (isGalleryMode) {
+                displayImage(selectedImage, img);
+            }
+        }).catch(() => {
+            // 이미지 로드 실패 시 다음 이미지로
+            if (isGalleryMode) {
+                galleryTimeout = setTimeout(() => {
+                    showNextImage();
+                }, 100);
+            }
+        });
+    }
+}
+
+// 이미지 표시 함수 (DOM 조작 최소화)
+function displayImage(src, imgElement) {
+    if (!isGalleryMode || !imageContainer) return;
+    
+    // 기존 이미지 제거 (배치 처리)
+    const existingImg = imageContainer.querySelector('.gallery-image');
+    if (existingImg) {
+        existingImg.classList.add('fade-out');
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                if (existingImg.parentNode) {
+                    existingImg.remove();
+                }
+            }, 300);
+        });
+    }
+    
+    // 새 이미지 요소 생성
+    const img = imgElement || document.createElement('img');
+    if (!imgElement) {
+        img.src = src;
+    }
+    img.className = 'gallery-image';
+    img.alt = 'Gallery Image';
+    
+    // 새 이미지 추가 (requestAnimationFrame 사용)
+    requestAnimationFrame(() => {
+        if (!isGalleryMode || !imageContainer) return;
+        
+        img.classList.add('fade-in');
+        imageContainer.appendChild(img);
+        
+        // 2.5초 후 다음 이미지로 전환
+        if (galleryTimeout) {
+            clearTimeout(galleryTimeout);
+        }
+        galleryTimeout = setTimeout(() => {
+            showNextImage();
+        }, 2500);
+    });
+}
+
+// 원래 페이지로 복귀
+function returnToMainPage() {
+    isGalleryMode = false;
+    
+    // 타이머 정리
+    if (galleryTimeout) {
+        clearTimeout(galleryTimeout);
+        galleryTimeout = null;
+    }
+    
+    // 이미지 컨테이너 제거 (배치 처리)
+    if (imageContainer) {
+        imageContainer.classList.add('fade-out');
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                if (imageContainer.parentNode) {
+                    imageContainer.remove();
+                }
+                imageContainer = null; // 참조 제거 (메모리 최적화)
+            }, 500);
+        });
+    }
+    
+    // 갤러리 모드 해제 (원형 마스크 역방향 애니메이션)
+    const body = document.body;
+    body.classList.remove('gallery-mode');
+    body.classList.add('gallery-exit');
+    
+    // 애니메이션 완료 후 클래스 제거
+    setTimeout(() => {
+        body.classList.remove('gallery-exit');
+    }, 1000);
+    
+    // 프리로드 캐시 정리 (메모리 최적화 - 선택적)
+    // preloadedImages.clear(); // 필요시 주석 해제
+}
+
+// 이벤트 리스너
+document.addEventListener('click', handleDoubleClick, { passive: true });
 
 // 별 생성 초기화
 createStars();
+
+// 이미지 목록 초기화
+initializeImageList();
 
