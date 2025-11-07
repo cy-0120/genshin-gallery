@@ -353,7 +353,7 @@ let preloadedImages = new Map(); // 프리로드된 이미지 캐시
 // 실제 이미지 파일명에 맞게 수정 필요
 function initializeImageList() {
     imageList = [
-        'src/img/qiqi-ice.jpg',
+        'img/qiqi-ice.jpg',
         // 추가 이미지가 있다면 여기에 추가
         // '/img/image2.jpg',
         // '/img/image3.jpg',
