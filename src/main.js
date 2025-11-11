@@ -45,6 +45,24 @@ class PerformanceMonitor {
 
 const performanceMonitor = new PerformanceMonitor();
 
+// 윈도우 크기 캐싱
+let cachedWindowSize = {
+    width: window.innerWidth,
+    height: window.innerHeight,
+    maxDimension: Math.max(window.innerWidth, window.innerHeight)
+};
+
+// 윈도우 리사이즈 시 캐시 업데이트 (throttle 적용)
+let resizeTimeout = null;
+window.addEventListener('resize', () => {
+    if (resizeTimeout) clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+        cachedWindowSize.width = window.innerWidth;
+        cachedWindowSize.height = window.innerHeight;
+        cachedWindowSize.maxDimension = Math.max(window.innerWidth, window.innerHeight);
+    }, 100);
+}, { passive: true });
+
 // 별 생성 
 function createStars() {
     const starfield = document.getElementById('starfield');
@@ -57,11 +75,11 @@ function createStars() {
         const star = document.createElement('div');
         star.className = 'star';
         
-        // 별 크기 랜덤 선택
+        // 별 크기 랜덤 선택 (더 자연스러운 분포)
         const size = Math.random();
-        if (size > 0.7) {
+        if (size > 0.75) {
             star.classList.add('large');
-        } else if (size > 0.4) {
+        } else if (size > 0.45) {
             star.classList.add('medium');
         }
         
@@ -71,9 +89,11 @@ function createStars() {
         star.style.left = left + '%';
         star.style.top = top + '%';
         
-        // 랜덤 애니메이션 딜레이
-        star.style.animationDelay = Math.random() * 3 + 's';
-        star.style.animationDuration = (Math.random() * 2 + 2) + 's';
+        // 랜덤 애니메이션 딜레이 (더 자연스러운 분포)
+        const delay = Math.random() * 4 + 1; // 1-5초
+        const duration = Math.random() * 3 + 2.5; // 2.5-5.5초
+        star.style.animationDelay = delay + 's';
+        star.style.animationDuration = duration + 's';
         
         // 별 데이터 저장
         starData.push({
@@ -91,31 +111,31 @@ function createStars() {
 
 // 별 반짝임 체크 함수
 function checkStarsInRipple(clickX, clickY, currentRadius, maxRadius) {
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
-    
-    // 픽셀 단위로 거리를 계산하기 위해 기준값 설정 (한 번만 계산)
-    const maxDimension = Math.max(windowWidth, windowHeight);
-    const maxDimensionPercent = maxDimension / 100; // 퍼센트를 픽셀으로 변환하는 상수
+    // 캐시된 윈도우 크기 사용
+    const { width: windowWidth, height: windowHeight, maxDimension } = cachedWindowSize;
+    const maxDimensionPercent = maxDimension / 100;
     
     // 클릭 위치를 퍼센트로 변환 (한 번만 계산)
     const clickXPercent = (clickX / windowWidth) * 100;
     const clickYPercent = (clickY / windowHeight) * 100;
     
     // 파동의 가장자리 근처에 있는 별 감지 (파동 굴곡과 만나는 지점)
-    const waveThickness = maxDimension * 0.06; // 파동 두께 증가 (5% → 6% - 더 넓은 범위로 체크 빈도 감소)
+    const waveThickness = maxDimension * 0.06;
     const innerRadius = currentRadius - waveThickness;
     const outerRadius = currentRadius + waveThickness;
     
-    // 퍼센트 단위로 반경 계산
+    // 퍼센트 단위로 반경 계산 (제곱값 미리 계산)
     const innerRadiusPercent = innerRadius / maxDimensionPercent;
     const outerRadiusPercent = outerRadius / maxDimensionPercent;
+    const innerRadiusSquared = innerRadiusPercent * innerRadiusPercent;
+    const outerRadiusSquared = outerRadiusPercent * outerRadiusPercent;
     
     // 배치 처리로 DOM 조작 최소화
     const starsToSparkle = [];
+    const starDataLength = starData.length;
     
     // 별 데이터를 사용하여 계산
-    for (let i = 0; i < starData.length; i++) {
+    for (let i = 0; i < starDataLength; i++) {
         const starInfo = starData[i];
         const star = starInfo.element;
         
@@ -127,27 +147,25 @@ function checkStarsInRipple(clickX, clickY, currentRadius, maxRadius) {
         const dy = starInfo.topPercent - clickYPercent;
         const distancePercentSquared = dx * dx + dy * dy;
         
-        // 제곱으로 비교 (Math.sqrt 제거로 성능 향상)
-        const innerRadiusSquared = innerRadiusPercent * innerRadiusPercent;
-        const outerRadiusSquared = outerRadiusPercent * outerRadiusPercent;
-        
         // 파동 가장자리 근처에 있는 별만 반짝임
         if (distancePercentSquared >= innerRadiusSquared && distancePercentSquared <= outerRadiusSquared) {
             starsToSparkle.push(star);
         }
     }
     
-    // 배치로 한 번에 처리
+    // 배치로 한 번에 처리 (requestAnimationFrame 사용)
     if (starsToSparkle.length > 0) {
-        starsToSparkle.forEach(star => {
-            star.classList.add('sparkle');
-            
-            // 애니메이션 종료 후 클래스 제거
-            setTimeout(() => {
-                if (star.classList.contains('sparkle')) {
-                    star.classList.remove('sparkle');
-                }
-            }, 600); // 500ms → 600ms (애니메이션 시간과 일치)
+        requestAnimationFrame(() => {
+            starsToSparkle.forEach(star => {
+                star.classList.add('sparkle');
+                
+                // 애니메이션 종료 후 클래스 제거
+                setTimeout(() => {
+                    if (star.classList.contains('sparkle')) {
+                        star.classList.remove('sparkle');
+                    }
+                }, 600);
+            });
         });
     }
 }
@@ -157,6 +175,8 @@ let isAnimating = false;
 
 // Ripple 효과 생성 - 물방울 떨어뜨리는 느낌
 function createRipple(event) {
+    // 갤러리 모드나 메뉴 모드일 때는 리플 효과 생성 안 함
+    if (isGalleryMode || isMenuMode) return;
     // 애니메이션 중이면 무시
     if (isAnimating) return;
     
@@ -251,12 +271,16 @@ function createRipple(event) {
         const elapsed = currentTime - startTime;
         
         if (elapsed < totalDuration) {
-            // 프레임 레이트 모니터링 업데이트 (간격 조절)
-            const adaptiveInterval = performanceMonitor.update();
-            
             // 적응형 체크 간격 사용 (성능에 따라 자동 조절)
-            if (currentTime - lastCheckTime >= adaptiveInterval) {
-                const progress = elapsed / totalDuration; // Math.min 제거
+            // performanceMonitor.update()는 1초마다만 호출
+            if (currentTime - lastCheckTime >= performanceMonitor.getInterval()) {
+                // 프레임 레이트 모니터링 업데이트 (간격 조절) - 1초마다만 실제 업데이트
+                const timeSinceLastUpdate = currentTime - performanceMonitor.lastTime;
+                if (timeSinceLastUpdate >= 1000) {
+                    performanceMonitor.update();
+                }
+                
+                const progress = elapsed / totalDuration;
                 const currentRadius = maxRadius * progress;
                 
                 // 프레임 드롭 감지 시 별 체크 건너뛰기 (더 적극적으로 - 5프레임마다 체크)
@@ -508,6 +532,9 @@ let clickTimeout = null;
 const DOUBLE_CLICK_DELAY = 300; // 더블 클릭 감지 시간 (ms)
 
 function handleDoubleClick(event) {
+    // 갤러리 모드일 때는 더블 클릭 무시
+    if (isGalleryMode) return;
+    
     const currentTime = performance.now(); // Date.now() 대신 performance.now() 사용
     
     // 더블 클릭 감지 (300ms 이내)
@@ -544,6 +571,21 @@ function showSelectionMenu(event) {
     
     // 제목 숨기기
     document.body.classList.add('menu-mode');
+    
+    // 선택 메뉴용 나가기 버튼 생성 및 추가
+    if (!exitButton) {
+        exitButton = document.createElement('button');
+        exitButton.className = 'gallery-exit-button';
+        exitButton.textContent = 'Exit';
+        exitButton.addEventListener('click', () => {
+            hideSelectionMenu();
+        });
+        document.body.appendChild(exitButton);
+    } else {
+        // 이미 존재하면 표시
+        exitButton.style.opacity = '1';
+        exitButton.style.pointerEvents = 'all';
+    }
     
     // 선택 메뉴 생성
     if (!selectionMenu) {
@@ -599,6 +641,18 @@ function hideSelectionMenu() {
     
     isMenuMode = false;
     document.body.classList.remove('menu-mode');
+    
+    // 나가기 버튼 숨기기
+    if (exitButton) {
+        exitButton.style.opacity = '0';
+        exitButton.style.pointerEvents = 'none';
+        setTimeout(() => {
+            if (exitButton && exitButton.parentNode && !isGalleryMode) {
+                exitButton.remove();
+                exitButton = null;
+            }
+        }, 300);
+    }
     
     if (selectionMenu) {
         selectionMenu.classList.remove('active');
@@ -1059,7 +1113,7 @@ function returnToMainPage() {
                 if (imageContainer.parentNode) {
                     imageContainer.remove();
                 }
-                imageContainer = null; // 참조 제거 (메모리 최적화)
+                imageContainer = null; // 참조 제거
             }, 1000);
         });
     }
@@ -1069,7 +1123,7 @@ function returnToMainPage() {
         body.classList.remove('gallery-exit');
     }, 1000);
     
-    // 프리로드 캐시 정리 (메모리 최적화 - 선택적)
+    // 프리로드 캐시 정리 (선택적)
     // preloadedImages.clear(); // 필요시 주석 해제
 }
 

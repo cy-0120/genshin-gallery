@@ -52,7 +52,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    /* 그라데이션 최적화: 5개 → 3개로 감소 (성능 향상) */
+    /* 그라데이션: 5개 → 3개로 감소 */
     background: 
         radial-gradient(circle at 20% 30%, var(--color-purple-1) 0%, transparent 50%),
         radial-gradient(circle at 80% 70%, var(--color-purple-2) 0%, transparent 50%),
@@ -196,7 +196,7 @@ body {
     transform: translateZ(0);
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-    /* GPU 가속 최적화 - 기본값에서는 will-change 제거 */
+    /* GPU 가속 - 기본값에서는 will-change 제거 */
     contain: layout style paint;
 }
 
@@ -223,15 +223,23 @@ body {
         opacity: 1;
         transform: scale(1);
     }
+    25% {
+        opacity: 0.6;
+        transform: scale(0.95);
+    }
     50% {
         opacity: 0.3;
-        transform: scale(0.8);
+        transform: scale(0.85);
+    }
+    75% {
+        opacity: 0.6;
+        transform: scale(0.95);
     }
 }
 
 /* 별 반짝임 효과 - 파동과 겹칠 때 (파동 굴곡과 만나는 점) */
 .star.sparkle {
-    animation: sparkle var(--animation-duration-sparkle) cubic-bezier(0.4, 0, 0.2, 1);
+    animation: sparkle var(--animation-duration-sparkle) cubic-bezier(0.25, 0.46, 0.45, 0.94);
     z-index: 5;
     will-change: transform, opacity, box-shadow;
     /* GPU 가속 강화 */
@@ -244,24 +252,29 @@ body {
         transform: scale(1);
         box-shadow: 0 0 6px var(--color-star), 0 0 12px var(--color-star);
     }
-    20% {
+    15% {
         opacity: 1;
-        transform: scale(2);
-        box-shadow: 0 0 20px var(--color-star), 0 0 40px var(--color-star);
+        transform: scale(1.8);
+        box-shadow: 0 0 18px var(--color-star), 0 0 36px var(--color-star);
     }
-    40% {
+    30% {
         opacity: 1;
-        transform: scale(1.5);
-        box-shadow: 0 0 15px var(--color-star), 0 0 30px var(--color-star);
+        transform: scale(2.2);
+        box-shadow: 0 0 25px var(--color-star), 0 0 50px var(--color-star);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.6);
+        box-shadow: 0 0 16px var(--color-star), 0 0 32px var(--color-star);
     }
     70% {
-        opacity: 1;
-        transform: scale(1.2);
-        box-shadow: 0 0 10px var(--color-star), 0 0 20px var(--color-star);
+        opacity: 0.98;
+        transform: scale(1.15);
+        box-shadow: 0 0 9px var(--color-star), 0 0 18px var(--color-star);
     }
-    90% {
-        opacity: 0.95;
-        transform: scale(1.05);
+    85% {
+        opacity: 0.96;
+        transform: scale(1.03);
         box-shadow: 0 0 7px var(--color-star), 0 0 14px var(--color-star);
     }
     100% {
@@ -495,9 +508,9 @@ body {
     box-shadow: 0 0 20px rgba(201, 169, 255, 0.15);
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-    /* GPU 가속 최적화 - transform과 opacity만 변경 */
+    /* GPU 가속 - transform과 opacity만 변경 */
     will-change: transform, opacity;
-    /* 렌더링 최적화 */
+    /* 렌더링 */
     contain: strict;
     isolation: isolate;
     /* 하드웨어 가속 강제 */
@@ -562,25 +575,29 @@ body {
         filter: url(#wave-filter);
         transform: perspective(var(--perspective-base)) translateZ(0);
     }
-    20% {
+    15% {
         filter: url(#wave-filter);
-        transform: perspective(var(--perspective-base)) translateZ(-5px);
+        transform: perspective(var(--perspective-base)) translateZ(-4px);
     }
-    40% {
+    30% {
         filter: url(#wave-filter);
-        transform: perspective(var(--perspective-base)) translateZ(-10px);
+        transform: perspective(var(--perspective-base)) translateZ(-8px);
+    }
+    45% {
+        filter: url(#wave-filter);
+        transform: perspective(var(--perspective-base)) translateZ(-11px);
     }
     60% {
         filter: url(#wave-filter);
-        transform: perspective(var(--perspective-base)) translateZ(-6px);
+        transform: perspective(var(--perspective-base)) translateZ(-7px);
     }
-    80% {
+    75% {
         filter: url(#wave-filter);
-        transform: perspective(var(--perspective-base)) translateZ(-2px);
+        transform: perspective(var(--perspective-base)) translateZ(-3px);
     }
-    95% {
+    90% {
         filter: url(#wave-filter);
-        transform: perspective(var(--perspective-base)) translateZ(-0.5px);
+        transform: perspective(var(--perspective-base)) translateZ(-0.8px);
     }
     100% {
         filter: none;
@@ -592,20 +609,23 @@ body {
     0% {
         transform: perspective(var(--perspective-star)) translateZ(0) rotateX(0deg);
     }
-    20% {
-        transform: perspective(var(--perspective-star)) translateZ(-3px) rotateX(0.4deg);
+    15% {
+        transform: perspective(var(--perspective-star)) translateZ(-2.5px) rotateX(0.35deg);
     }
-    40% {
-        transform: perspective(var(--perspective-star)) translateZ(-5px) rotateX(0.8deg);
+    30% {
+        transform: perspective(var(--perspective-star)) translateZ(-4.5px) rotateX(0.65deg);
+    }
+    45% {
+        transform: perspective(var(--perspective-star)) translateZ(-5.5px) rotateX(0.85deg);
     }
     60% {
-        transform: perspective(var(--perspective-star)) translateZ(-3px) rotateX(0.4deg);
+        transform: perspective(var(--perspective-star)) translateZ(-3.5px) rotateX(0.5deg);
     }
-    80% {
-        transform: perspective(var(--perspective-star)) translateZ(-1px) rotateX(0.15deg);
+    75% {
+        transform: perspective(var(--perspective-star)) translateZ(-1.5px) rotateX(0.2deg);
     }
-    95% {
-        transform: perspective(var(--perspective-star)) translateZ(-0.3px) rotateX(0.05deg);
+    90% {
+        transform: perspective(var(--perspective-star)) translateZ(-0.4px) rotateX(0.08deg);
     }
     100% {
         transform: perspective(var(--perspective-star)) translateZ(0) rotateX(0deg);
@@ -615,6 +635,13 @@ body {
 /* 이미지 갤러리 모드 */
 body.gallery-mode {
     overflow: hidden;
+}
+
+/* 갤러리 모드일 때 배경 요소와 상호작용 차단 */
+body.gallery-mode .background,
+body.gallery-mode .starfield,
+body.gallery-mode .star {
+    pointer-events: none;
 }
 
 body.gallery-mode::before {
@@ -629,7 +656,7 @@ body.gallery-mode::before {
     animation: gallery-mask-expand 0.8s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
     z-index: 100;
     pointer-events: none;
-    /* GPU 가속 최적화 */
+    /* GPU 가속 */
     will-change: clip-path;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
@@ -670,7 +697,7 @@ body.gallery-exit::before {
     justify-content: center;
     z-index: 101;
     pointer-events: none;
-    /* GPU 가속 최적화 */
+    /* GPU 가속 */
     will-change: contents;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
@@ -687,12 +714,12 @@ body.gallery-exit::before {
     object-fit: contain;
     border-radius: 8px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-    /* GPU 가속 최적화 */
+    /* GPU 가속 */
     will-change: transform, opacity;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
     transform: translateZ(0);
-    /* 이미지 렌더링 최적화 */
+    /* 이미지 렌더링 */
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
 }
@@ -941,7 +968,8 @@ body.menu-mode .title {
     pointer-events: none;
 }
 
-body.gallery-mode .gallery-exit-button {
+body.gallery-mode .gallery-exit-button,
+body.menu-mode .gallery-exit-button {
     opacity: 1;
     pointer-events: all;
     animation: fade-in-button 0.5s ease 0.8s forwards;
