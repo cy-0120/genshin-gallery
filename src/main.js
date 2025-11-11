@@ -22,7 +22,7 @@ class PerformanceMonitor {
             this.frameCount = 0;
             this.lastTime = currentTime;
             
-            // FPS에 따라 체크 간격 조절 (더 세밀하게)
+            // FPS에 따라 체크 간격 조절
             if (this.fps < 30) {
                 this.adaptiveInterval = 200;
             } else if (this.fps < 45) {
@@ -51,7 +51,7 @@ let cachedWindowSize = {
     maxDimension: Math.max(window.innerWidth, window.innerHeight)
 };
 
-// 윈도우 리사이즈 시 캐시 업데이트 (throttle 적용)
+// 윈도우 리사이즈 시 캐시 업데이트
 let resizeTimeout = null;
 window.addEventListener('resize', () => {
     if (resizeTimeout) clearTimeout(resizeTimeout);
@@ -65,7 +65,7 @@ window.addEventListener('resize', () => {
 // 별 생성 
 function createStars() {
     const starfield = document.getElementById('starfield');
-    const starCount = 175; 
+    const starCount = 120; 
     
     // DocumentFragment 사용하여 DOM 조작 최소화
     const fragment = document.createDocumentFragment();
@@ -233,7 +233,7 @@ function createRipple(event) {
     // 한 번에 모든 요소 추가
     background.appendChild(fragment);
     
-    // 기존 wave 클래스 제거 (중복 방지)
+    // 기존 wave 클래스 제거
     background.classList.remove('wave');
     starfield.classList.remove('wave');
     
@@ -246,7 +246,7 @@ function createRipple(event) {
     
     // 별 반짝임 효과 - 파동이 퍼져나가는 동안
     const maxRadius = Math.max(windowWidth, windowHeight) * 1.5;
-    const totalDuration = 2100; // 애니메이션 시간 조정 (2200 → 2100, CSS와 동기화)
+    const totalDuration = 2100; // 애니메이션 시간 조정
     const startTime = performance.now();
     let animationFrameId = null;
     let lastCheckTime = 0;
@@ -372,7 +372,7 @@ let preloadedImages = new Map(); // 프리로드된 이미지 캐시
 let selectionMenu = null; // 선택 메뉴 요소
 let exitButton = null; // 나가기 버튼
 
-// 이미지 작가 정보 매핑 (파일명: 작가명)
+// 이미지 작가 정보 매핑
 const imageArtistMap = {
     'qiqi-ice.jpg': 'unknown',
     'Lynette-wind.jpg': '@niyone09',
@@ -523,7 +523,7 @@ function initializeImageList() {
 // 더블 클릭 감지
 let lastClickTime = 0;
 let clickTimeout = null;
-const DOUBLE_CLICK_DELAY = 300; // 더블 클릭 감지 시간 (ms)
+const DOUBLE_CLICK_DELAY = 300; // 더블 클릭 감지 시간
 
 function handleDoubleClick(event) {
     // 갤러리 모드일 때는 더블 클릭 무시
@@ -531,7 +531,7 @@ function handleDoubleClick(event) {
     
     const currentTime = performance.now(); 
     
-    // 더블 클릭 감지 (300ms 이내)
+    // 더블 클릭 감지
     if (currentTime - lastClickTime < DOUBLE_CLICK_DELAY) {
         if (clickTimeout) {
             clearTimeout(clickTimeout);
@@ -696,11 +696,11 @@ function startImageGallery(event, type = 'official') {
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
     
-    // 클릭 위치를 퍼센트로 변환 (한 번만 계산)
+    // 클릭 위치를 퍼센트로 변환
     const clickXPercent = (x / windowWidth) * 100;
     const clickYPercent = (y / windowHeight) * 100;
     
-    // CSS 변수 설정 (배치 처리)
+    // CSS 변수 설정
     const root = document.documentElement;
     root.style.setProperty('--gallery-click-x', clickXPercent + '%');
     root.style.setProperty('--gallery-click-y', clickYPercent + '%');
@@ -728,7 +728,7 @@ function startImageGallery(event, type = 'official') {
         exitButton.style.zIndex = '1000';
         document.body.appendChild(exitButton);
     } else {
-        // 이미 존재하면 표시 (이벤트 리스너는 이미 적절히 설정되어 있음)
+        // 이미 존재하면 표시
         exitButton.style.pointerEvents = 'auto';
         exitButton.style.zIndex = '1000';
     }
@@ -757,7 +757,7 @@ function startImageGallery(event, type = 'official') {
         });
     }
     
-    // 첫 번째 이미지 표시 (requestAnimationFrame 사용)
+    // 첫 번째 이미지 표시
     requestAnimationFrame(() => {
         setTimeout(() => {
             showNextImage();
@@ -775,7 +775,7 @@ function showNextImage() {
         return;
     }
     
-    // 사용되지 않은 이미지 중 랜덤 선택 (filter 대신 직접 계산)
+    // 사용되지 않은 이미지 중 랜덤 선택
     const availableCount = imageList.length - usedImages.length;
     if (availableCount === 0) {
         showCredits();
@@ -798,7 +798,7 @@ function showNextImage() {
     usedImages.push(selectedImageObj);
     currentImageIndex = usedImages.length - 1;
     
-    // 이미지 컨테이너 생성 또는 업데이트 (캐싱 활용)
+    // 이미지 컨테이너 생성 또는 업데이트
     if (!imageContainer) {
         imageContainer = document.createElement('div');
         imageContainer.id = 'gallery-image-container';
