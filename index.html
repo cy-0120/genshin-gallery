@@ -9,12 +9,12 @@
 <body>
     <svg style="position: absolute; width: 0; height: 0;">
         <defs>
-            <!-- 물결 파장 효과를 위한 필터 (성능 최적화) -->
+            <!-- 물결 파장 효과를 위한 필터 -->
             <filter id="wave-filter" x="-50%" y="-50%" width="200%" height="200%">
                 <feTurbulence baseFrequency="0.015 0.03" numOctaves="2" seed="2" result="turbulence">
-                    <animate attributeName="baseFrequency" values="0.015 0.03;0.025 0.05;0.015 0.03" dur="2.0s" repeatCount="1"/>
+                    <animate attributeName="baseFrequency" values="0.015 0.03;0.028 0.055;0.015 0.03" dur="1.8s" repeatCount="1"/>
                 </feTurbulence>
-                <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="5" xChannelSelector="R" yChannelSelector="G"/>
+                <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="6" xChannelSelector="R" yChannelSelector="G"/>
             </filter>
             <!-- 파장 효과를 위한 원형 필터 -->
             <filter id="ripple-wave-filter" x="-100%" y="-100%" width="300%" height="300%">

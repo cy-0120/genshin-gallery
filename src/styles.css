@@ -99,7 +99,7 @@ body {
         linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.8) 100%),
         var(--color-bg);
     filter: url(#wave-filter);
-    animation: water-ripple-effect 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: water-ripple-effect 2.2s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
     mix-blend-mode: screen;
 }
 
@@ -115,37 +115,37 @@ body {
         filter: url(#wave-filter) brightness(1);
     }
     20% {
-        transform: perspective(var(--perspective-base)) translateZ(-5px) scale(0.3);
+        transform: perspective(var(--perspective-base)) translateZ(-6px) scale(0.3);
         opacity: 0.9;
-        filter: url(#wave-filter) brightness(1.1);
+        filter: url(#wave-filter) brightness(1.15);
     }
     40% {
-        transform: perspective(var(--perspective-base)) translateZ(-8px) scale(0.6);
+        transform: perspective(var(--perspective-base)) translateZ(-10px) scale(0.6);
         opacity: 0.7;
-        filter: url(#wave-filter) brightness(1.2);
+        filter: url(#wave-filter) brightness(1.25);
     }
     60% {
-        transform: perspective(var(--perspective-base)) translateZ(-6px) scale(0.8);
+        transform: perspective(var(--perspective-base)) translateZ(-7px) scale(0.8);
         opacity: 0.5;
-        filter: url(#wave-filter) brightness(1.1);
+        filter: url(#wave-filter) brightness(1.15);
     }
     75% {
-        transform: perspective(var(--perspective-base)) translateZ(-4px) scale(0.95);
+        transform: perspective(var(--perspective-base)) translateZ(-5px) scale(0.95);
         opacity: 0.3;
-        filter: url(#wave-filter) brightness(1.05);
+        filter: url(#wave-filter) brightness(1.08);
     }
     85% {
-        transform: perspective(var(--perspective-base)) translateZ(-2px) scale(0.98);
+        transform: perspective(var(--perspective-base)) translateZ(-2.5px) scale(0.98);
         opacity: 0.2;
-        filter: url(#wave-filter) brightness(1.02);
+        filter: url(#wave-filter) brightness(1.03);
     }
     92% {
-        transform: perspective(var(--perspective-base)) translateZ(-0.5px) scale(0.99);
+        transform: perspective(var(--perspective-base)) translateZ(-0.8px) scale(0.99);
         opacity: 0.1;
         filter: url(#wave-filter) brightness(1.01);
     }
     99% {
-        transform: perspective(var(--perspective-base)) translateZ(-0.05px) scale(0.999);
+        transform: perspective(var(--perspective-base)) translateZ(-0.1px) scale(0.999);
         opacity: 0.05;
         filter: url(#wave-filter) brightness(1.005);
     }
@@ -562,21 +562,25 @@ body {
         filter: url(#wave-filter);
         transform: perspective(var(--perspective-base)) translateZ(0);
     }
-    25% {
+    20% {
         filter: url(#wave-filter);
-        transform: perspective(var(--perspective-base)) translateZ(-4px);
+        transform: perspective(var(--perspective-base)) translateZ(-5px);
     }
-    50% {
+    40% {
         filter: url(#wave-filter);
-        transform: perspective(var(--perspective-base)) translateZ(-8px);
+        transform: perspective(var(--perspective-base)) translateZ(-10px);
     }
-    75% {
+    60% {
         filter: url(#wave-filter);
-        transform: perspective(var(--perspective-base)) translateZ(-4px);
+        transform: perspective(var(--perspective-base)) translateZ(-6px);
     }
-    90% {
+    80% {
         filter: url(#wave-filter);
-        transform: perspective(var(--perspective-base)) translateZ(-1px);
+        transform: perspective(var(--perspective-base)) translateZ(-2px);
+    }
+    95% {
+        filter: url(#wave-filter);
+        transform: perspective(var(--perspective-base)) translateZ(-0.5px);
     }
     100% {
         filter: none;
@@ -588,17 +592,20 @@ body {
     0% {
         transform: perspective(var(--perspective-star)) translateZ(0) rotateX(0deg);
     }
-    25% {
-        transform: perspective(var(--perspective-star)) translateZ(-2px) rotateX(0.35deg);
+    20% {
+        transform: perspective(var(--perspective-star)) translateZ(-3px) rotateX(0.4deg);
     }
-    50% {
-        transform: perspective(var(--perspective-star)) translateZ(-4px) rotateX(0.7deg);
+    40% {
+        transform: perspective(var(--perspective-star)) translateZ(-5px) rotateX(0.8deg);
     }
-    75% {
-        transform: perspective(var(--perspective-star)) translateZ(-2px) rotateX(0.35deg);
+    60% {
+        transform: perspective(var(--perspective-star)) translateZ(-3px) rotateX(0.4deg);
     }
-    90% {
-        transform: perspective(var(--perspective-star)) translateZ(-0.5px) rotateX(0.1deg);
+    80% {
+        transform: perspective(var(--perspective-star)) translateZ(-1px) rotateX(0.15deg);
+    }
+    95% {
+        transform: perspective(var(--perspective-star)) translateZ(-0.3px) rotateX(0.05deg);
     }
     100% {
         transform: perspective(var(--perspective-star)) translateZ(0) rotateX(0deg);
