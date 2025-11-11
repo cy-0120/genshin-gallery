@@ -10,11 +10,10 @@ class PerformanceMonitor {
         this.frameCount = 0;
         this.lastTime = performance.now();
         this.fps = 60;
-        this.adaptiveInterval = 200; // 기본 체크 간격 증가
+        this.adaptiveInterval = 100; // 기본 체크 간격 감소 (더 부드러운 애니메이션)
     }
     
     update() {
-        this.frameCount++;
         const currentTime = performance.now();
         
         // 1초마다 FPS 계산
@@ -23,15 +22,15 @@ class PerformanceMonitor {
             this.frameCount = 0;
             this.lastTime = currentTime;
             
-            // FPS에 따라 체크 간격 조절
+            // FPS에 따라 체크 간격 조절 (더 세밀하게)
             if (this.fps < 30) {
-                this.adaptiveInterval = 300; // 낮은 FPS일 때 간격 대폭 증가
-            } else if (this.fps < 45) {
                 this.adaptiveInterval = 200;
+            } else if (this.fps < 45) {
+                this.adaptiveInterval = 120;
             } else if (this.fps < 55) {
-                this.adaptiveInterval = 150;
+                this.adaptiveInterval = 80;
             } else {
-                this.adaptiveInterval = 120; // 높은 FPS일 때 간격 감소
+                this.adaptiveInterval = 60; // 높은 FPS일 때 더 자주 체크
             }
         }
         
@@ -153,19 +152,17 @@ function checkStarsInRipple(clickX, clickY, currentRadius, maxRadius) {
         }
     }
     
-    // 배치로 한 번에 처리 (requestAnimationFrame 사용)
+    // 배치로 한 번에 처리
     if (starsToSparkle.length > 0) {
-        requestAnimationFrame(() => {
-            starsToSparkle.forEach(star => {
-                star.classList.add('sparkle');
-                
-                // 애니메이션 종료 후 클래스 제거
-                setTimeout(() => {
-                    if (star.classList.contains('sparkle')) {
-                        star.classList.remove('sparkle');
-                    }
-                }, 600);
-            });
+        starsToSparkle.forEach(star => {
+            star.classList.add('sparkle');
+            
+            // 애니메이션 종료 후 클래스 제거
+            setTimeout(() => {
+                if (star.classList.contains('sparkle')) {
+                    star.classList.remove('sparkle');
+                }
+            }, 600);
         });
     }
 }
@@ -271,20 +268,21 @@ function createRipple(event) {
         const elapsed = currentTime - startTime;
         
         if (elapsed < totalDuration) {
+            // 프레임 레이트 모니터링 업데이트 (매 프레임마다 카운트, 1초마다 FPS 계산)
+            performanceMonitor.frameCount++;
+            const timeSinceLastUpdate = currentTime - performanceMonitor.lastTime;
+            if (timeSinceLastUpdate >= 1000) {
+                performanceMonitor.update();
+            }
+            
             // 적응형 체크 간격 사용 (성능에 따라 자동 조절)
-            // performanceMonitor.update()는 1초마다만 호출
-            if (currentTime - lastCheckTime >= performanceMonitor.getInterval()) {
-                // 프레임 레이트 모니터링 업데이트 (간격 조절) - 1초마다만 실제 업데이트
-                const timeSinceLastUpdate = currentTime - performanceMonitor.lastTime;
-                if (timeSinceLastUpdate >= 1000) {
-                    performanceMonitor.update();
-                }
-                
+            const adaptiveInterval = performanceMonitor.getInterval();
+            if (currentTime - lastCheckTime >= adaptiveInterval) {
                 const progress = elapsed / totalDuration;
                 const currentRadius = maxRadius * progress;
                 
-                // 프레임 드롭 감지 시 별 체크 건너뛰기 (더 적극적으로 - 5프레임마다 체크)
-                const shouldCheck = performanceMonitor.fps >= 45 || frameSkipCount % 5 === 0;
+                // 프레임 드롭 감지 시 별 체크 건너뛰기 (완화 - 3프레임마다 체크)
+                const shouldCheck = performanceMonitor.fps >= 40 || frameSkipCount % 3 === 0;
                 if (shouldCheck) {
                     checkStarsInRipple(x, y, currentRadius, maxRadius);
                     frameSkipCount = 0;
@@ -577,14 +575,19 @@ function showSelectionMenu(event) {
         exitButton = document.createElement('button');
         exitButton.className = 'gallery-exit-button';
         exitButton.textContent = 'Exit';
-        exitButton.addEventListener('click', () => {
+        exitButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             hideSelectionMenu();
-        });
+        }, { passive: false });
+        exitButton.style.pointerEvents = 'auto';
+        exitButton.style.zIndex = '1000';
         document.body.appendChild(exitButton);
     } else {
         // 이미 존재하면 표시
         exitButton.style.opacity = '1';
-        exitButton.style.pointerEvents = 'all';
+        exitButton.style.pointerEvents = 'auto';
+        exitButton.style.zIndex = '1000';
     }
     
     // 선택 메뉴 생성
@@ -710,10 +713,17 @@ function startImageGallery(event, type = 'official') {
         exitButton = document.createElement('button');
         exitButton.className = 'gallery-exit-button';
         exitButton.textContent = 'Exit';
-        exitButton.addEventListener('click', () => {
+        exitButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             returnToSelectionMenu();
-        });
+        }, { passive: false });
+        exitButton.style.pointerEvents = 'auto';
+        exitButton.style.zIndex = '1000';
         document.body.appendChild(exitButton);
+    } else {
+        exitButton.style.pointerEvents = 'auto';
+        exitButton.style.zIndex = '1000';
     }
     
     // 선택된 타입에 따라 이미지 목록 설정

@@ -951,7 +951,7 @@ body.menu-mode .title {
     position: fixed;
     top: 20px;
     right: 20px;
-    z-index: 200;
+    z-index: 1000;
     padding: 12px 24px;
     font-size: 16px;
     color: rgba(255, 255, 255, 0.9);
@@ -966,12 +966,14 @@ body.menu-mode .title {
     transform: translateZ(0);
     opacity: 0;
     pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 body.gallery-mode .gallery-exit-button,
 body.menu-mode .gallery-exit-button {
-    opacity: 1;
-    pointer-events: all;
+    opacity: 1 !important;
+    pointer-events: auto !important;
     animation: fade-in-button 0.5s ease 0.8s forwards;
 }
 
