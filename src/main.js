@@ -524,6 +524,8 @@ function displayImage(src, imgElement) {
     
     // 기존 이미지 제거 (배치 처리)
     const existingImg = imageContainer.querySelector('.gallery-image');
+    const hasExistingImg = !!existingImg;
+    
     if (existingImg) {
         existingImg.classList.add('fade-out');
         requestAnimationFrame(() => {
@@ -543,8 +545,8 @@ function displayImage(src, imgElement) {
     img.className = 'gallery-image';
     img.alt = 'Gallery Image';
     
-    // 새 이미지 추가 (requestAnimationFrame 사용)
-    requestAnimationFrame(() => {
+    // 새 이미지 추가 타이밍 조정
+    const addNewImage = () => {
         if (!isGalleryMode || !imageContainer) return;
         
         img.classList.add('fade-in');
@@ -557,7 +559,21 @@ function displayImage(src, imgElement) {
         galleryTimeout = setTimeout(() => {
             showNextImage();
         }, 2500);
-    });
+    };
+    
+    if (hasExistingImg) {
+        // 기존 이미지가 있으면 fade-out 완료 후 추가 (300ms)
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                addNewImage();
+            }, 300);
+        });
+    } else {
+        // 기존 이미지가 없으면 바로 추가
+        requestAnimationFrame(() => {
+            addNewImage();
+        });
+    }
 }
 
 // 원래 페이지로 복귀
