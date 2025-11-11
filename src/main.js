@@ -10,7 +10,7 @@ class PerformanceMonitor {
         this.frameCount = 0;
         this.lastTime = performance.now();
         this.fps = 60;
-        this.adaptiveInterval = 100; // 기본 체크 간격 감소 
+        this.adaptiveInterval = 60; 
     }
     
     update() {
@@ -24,13 +24,13 @@ class PerformanceMonitor {
             
             // FPS에 따라 체크 간격 조절
             if (this.fps < 30) {
-                this.adaptiveInterval = 200;
+                this.adaptiveInterval = 150;
             } else if (this.fps < 45) {
-                this.adaptiveInterval = 120;
-            } else if (this.fps < 55) {
                 this.adaptiveInterval = 80;
+            } else if (this.fps < 55) {
+                this.adaptiveInterval = 50;
             } else {
-                this.adaptiveInterval = 60; 
+                this.adaptiveInterval = 40; 
             }
         }
         
@@ -65,7 +65,7 @@ window.addEventListener('resize', () => {
 // 별 생성 
 function createStars() {
     const starfield = document.getElementById('starfield');
-    const starCount = 120; 
+    const starCount = 150; 
     
     // DocumentFragment 사용하여 DOM 조작 최소화
     const fragment = document.createDocumentFragment();
@@ -119,7 +119,7 @@ function checkStarsInRipple(clickX, clickY, currentRadius, maxRadius) {
     const clickYPercent = (clickY / windowHeight) * 100;
     
     // 파동의 가장자리 근처에 있는 별 감지 
-    const waveThickness = maxDimension * 0.1; // 0.06 → 0.1 
+    const waveThickness = maxDimension * 0.15;
     const innerRadius = currentRadius - waveThickness;
     const outerRadius = currentRadius + waveThickness;
     
@@ -278,7 +278,8 @@ function createRipple(event) {
             if (currentTime - lastCheckTime >= adaptiveInterval) {
                 const progress = elapsed / totalDuration;
                 const currentRadius = maxRadius * progress;
-                const shouldCheck = performanceMonitor.fps >= 35 || frameSkipCount % 2 === 0;
+                // 체크 빈도 증가: FPS 조건 완화
+                const shouldCheck = performanceMonitor.fps >= 25 || frameSkipCount % 2 === 0;
                 if (shouldCheck) {
                     checkStarsInRipple(x, y, currentRadius, maxRadius);
                     frameSkipCount = 0;
