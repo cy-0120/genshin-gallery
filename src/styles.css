@@ -72,8 +72,9 @@ body {
 }
 
 .background.wave {
+    animation: water-wave var(--animation-duration-wave) cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
     will-change: transform, filter;
-    /* GPU 레이어 강제 생성 */
+    transform-origin: var(--click-x, 50%) var(--click-y, 50%);
     transform: perspective(var(--perspective-base)) translateZ(0);
 }
 
@@ -555,21 +556,6 @@ body {
         transform: translate(-50%, -50%) translateZ(0) scale(1.5);
         border-width: 0px;
     }
-}
-
-
-/* 배경 물결 파동 효과 */
-.background.wave {
-    animation: water-wave var(--animation-duration-wave) cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
-    will-change: transform, filter;
-    /* 클릭 위치를 중심으로 transform-origin 설정 */
-    transform-origin: var(--click-x, 50%) var(--click-y, 50%);
-    /* GPU 레이어 강제 생성 */
-    transform: perspective(var(--perspective-base)) translateZ(0);
-}
-
-.background:not(.wave) {
-    will-change: auto;
 }
 
 @keyframes water-wave {
