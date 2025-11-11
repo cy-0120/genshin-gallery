@@ -13,7 +13,7 @@
     --perspective-star: 1200px;
     --animation-duration-wave: 2.1s; /* 2.0s → 2.1s (자연스러운 종료를 위해 약간 증가) */
     --animation-duration-ripple: 0.9s; /* 1s → 0.9s */
-    --animation-duration-sparkle: 0.6s; /* 0.5s → 0.6s (퀄리티 개선) */
+    --animation-duration-sparkle: 0.8s; /* 0.6s → 0.8s (더 오래 반짝임) */
     --animation-duration-twinkle: 3s;
     --click-x: 50%;
     --click-y: 50%;
@@ -237,7 +237,7 @@ body {
     }
 }
 
-/* 별 반짝임 효과 - 파동과 겹칠 때 (파동 굴곡과 만나는 점) */
+/* 별 반짝임 효과  */
 .star.sparkle {
     animation: sparkle var(--animation-duration-sparkle) cubic-bezier(0.25, 0.46, 0.45, 0.94);
     z-index: 5;
@@ -504,11 +504,11 @@ body {
     /* filter 제거 - 굴곡은 배경에서만 적용 */
     animation: wave-ripple-expand var(--animation-duration-wave) cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
     z-index: 1;
-    /* box-shadow 단순화 (색상 강도 감소) */
+    /* box-shadow 단순화 */
     box-shadow: 0 0 20px rgba(201, 169, 255, 0.15);
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-    /* GPU 가속 - transform과 opacity만 변경 */
+    /* GPU 가속 */
     will-change: transform, opacity;
     /* 렌더링 */
     contain: strict;
@@ -556,7 +556,7 @@ body {
 }
 
 
-/* 배경 물결 파동 효과 - 입체적인 물결 (클릭 위치 중심) */
+/* 배경 물결 파동 효과 */
 .background.wave {
     animation: water-wave var(--animation-duration-wave) cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
     will-change: transform, filter;

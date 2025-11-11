@@ -10,7 +10,7 @@ class PerformanceMonitor {
         this.frameCount = 0;
         this.lastTime = performance.now();
         this.fps = 60;
-        this.adaptiveInterval = 100; // 기본 체크 간격 감소 (더 부드러운 애니메이션)
+        this.adaptiveInterval = 100; // 기본 체크 간격 감소 
     }
     
     update() {
@@ -30,7 +30,7 @@ class PerformanceMonitor {
             } else if (this.fps < 55) {
                 this.adaptiveInterval = 80;
             } else {
-                this.adaptiveInterval = 60; // 높은 FPS일 때 더 자주 체크
+                this.adaptiveInterval = 60; 
             }
         }
         
@@ -74,7 +74,7 @@ function createStars() {
         const star = document.createElement('div');
         star.className = 'star';
         
-        // 별 크기 랜덤 선택 (더 자연스러운 분포)
+        // 별 크기 랜덤 선택 
         const size = Math.random();
         if (size > 0.75) {
             star.classList.add('large');
@@ -88,7 +88,7 @@ function createStars() {
         star.style.left = left + '%';
         star.style.top = top + '%';
         
-        // 랜덤 애니메이션 딜레이 (더 자연스러운 분포)
+        // 랜덤 애니메이션 딜레이 
         const delay = Math.random() * 4 + 1; // 1-5초
         const duration = Math.random() * 3 + 2.5; // 2.5-5.5초
         star.style.animationDelay = delay + 's';
@@ -114,16 +114,16 @@ function checkStarsInRipple(clickX, clickY, currentRadius, maxRadius) {
     const { width: windowWidth, height: windowHeight, maxDimension } = cachedWindowSize;
     const maxDimensionPercent = maxDimension / 100;
     
-    // 클릭 위치를 퍼센트로 변환 (한 번만 계산)
+    // 클릭 위치를 퍼센트로 변환 
     const clickXPercent = (clickX / windowWidth) * 100;
     const clickYPercent = (clickY / windowHeight) * 100;
     
-    // 파동의 가장자리 근처에 있는 별 감지 (파동 굴곡과 만나는 지점)
-    const waveThickness = maxDimension * 0.06;
+    // 파동의 가장자리 근처에 있는 별 감지 
+    const waveThickness = maxDimension * 0.1; // 0.06 → 0.1 
     const innerRadius = currentRadius - waveThickness;
     const outerRadius = currentRadius + waveThickness;
     
-    // 퍼센트 단위로 반경 계산 (제곱값 미리 계산)
+    // 퍼센트 단위로 반경 계산 
     const innerRadiusPercent = innerRadius / maxDimensionPercent;
     const outerRadiusPercent = outerRadius / maxDimensionPercent;
     const innerRadiusSquared = innerRadiusPercent * innerRadiusPercent;
@@ -141,7 +141,7 @@ function checkStarsInRipple(clickX, clickY, currentRadius, maxRadius) {
         // 이미 반짝임 중인 별은 건너뛰기
         if (star.classList.contains('sparkle')) continue;
         
-        // 퍼센트 단위로 거리 계산 (제곱으로 비교 - Math.sqrt 제거)
+        // 퍼센트 단위로 거리 계산 
         const dx = starInfo.leftPercent - clickXPercent;
         const dy = starInfo.topPercent - clickYPercent;
         const distancePercentSquared = dx * dx + dy * dy;
@@ -162,7 +162,7 @@ function checkStarsInRipple(clickX, clickY, currentRadius, maxRadius) {
                 if (star.classList.contains('sparkle')) {
                     star.classList.remove('sparkle');
                 }
-            }, 600);
+            }, 700); 
         });
     }
 }
@@ -201,7 +201,7 @@ function createRipple(event) {
     const background = document.getElementById('background');
     const starfield = document.getElementById('starfield');
     
-    // CSS 변수로 클릭 위치 설정 (배경 파동 효과를 위한 중심점)
+    // CSS 변수로 클릭 위치 설정 
     document.documentElement.style.setProperty('--click-x', clickXPercent + '%');
     document.documentElement.style.setProperty('--click-y', clickYPercent + '%');
     
@@ -219,9 +219,7 @@ function createRipple(event) {
         waveLayer.style.left = clickXPercent + '%';
         waveLayer.style.top = clickYPercent + '%';
         waveLayer.style.animationDelay = (i * 0.4) + 's'; // 파장 순차 생성
-        // 직접 픽셀 값 설정 (calc() 대신)
         waveLayer.style.setProperty('--max-size', maxSize + 'px');
-        // transform은 CSS에서 처리하므로 여기서는 제거
         fragment.appendChild(waveLayer);
         
         // 애니메이션 종료 후 제거
@@ -255,7 +253,7 @@ function createRipple(event) {
     let frameSkipCount = 0;
     let isActive = true;
     
-    // requestAnimationFrame을 사용하여 부드러운 애니메이션
+    // requestAnimationFrame을 사용
     function animateSparkle(currentTime) {
         if (!isActive) {
             if (animationFrameId !== null) {
@@ -268,21 +266,19 @@ function createRipple(event) {
         const elapsed = currentTime - startTime;
         
         if (elapsed < totalDuration) {
-            // 프레임 레이트 모니터링 업데이트 (매 프레임마다 카운트, 1초마다 FPS 계산)
+            // 프레임 레이트 모니터링 업데이트
             performanceMonitor.frameCount++;
             const timeSinceLastUpdate = currentTime - performanceMonitor.lastTime;
             if (timeSinceLastUpdate >= 1000) {
                 performanceMonitor.update();
             }
             
-            // 적응형 체크 간격 사용 (성능에 따라 자동 조절)
+            // 적응형 체크 간격 사용
             const adaptiveInterval = performanceMonitor.getInterval();
             if (currentTime - lastCheckTime >= adaptiveInterval) {
                 const progress = elapsed / totalDuration;
                 const currentRadius = maxRadius * progress;
-                
-                // 프레임 드롭 감지 시 별 체크 건너뛰기 (완화 - 3프레임마다 체크)
-                const shouldCheck = performanceMonitor.fps >= 40 || frameSkipCount % 3 === 0;
+                const shouldCheck = performanceMonitor.fps >= 35 || frameSkipCount % 2 === 0;
                 if (shouldCheck) {
                     checkStarsInRipple(x, y, currentRadius, maxRadius);
                     frameSkipCount = 0;
@@ -327,14 +323,14 @@ function createRipple(event) {
     };
     
     const handleStarfieldEnd = () => {
-        // 별바다 애니메이션은 이미 처리됨 (background와 함께 처리)
+        // 별바다 애니메이션은 이미 처리됨 
     };
     
     // 애니메이션 종료 이벤트 리스너 등록
     background.addEventListener('animationend', handleAnimationEnd, { once: true });
     starfield.addEventListener('animationend', handleStarfieldEnd, { once: true });
     
-    // 리플라이프 안전장치 (최대 3초 후 자동 제거)
+    // 리플라이프 안전장치
     const cleanupTimer = setTimeout(() => {
         if (background.classList.contains('wave')) {
             background.removeEventListener('animationend', handleAnimationEnd);
@@ -342,7 +338,7 @@ function createRipple(event) {
             
             requestAnimationFrame(() => {
                 ripple.remove();
-                // 모든 파장 레이어 제거 (배치 처리)
+                // 모든 파장 레이어 제거
                 const waveLayers = background.querySelectorAll('.wave-layer');
                 waveLayers.forEach(layer => layer.remove());
                 if (animationFrameId !== null) {
@@ -502,7 +498,7 @@ function initializeFanWorkImages() {
     fanWorkImages = imagePaths.map(path => {
         const fileName = path.split('/').pop();
         // 폴더명에서 작가명 추출
-        const folderName = path.split('/')[2]; // 'fan work/@kikokiko612/...' 형식
+        const folderName = path.split('/')[2]; 
         let artist = null;
         if (folderName && folderName !== 'Unknown') {
             artist = folderName.replace('@', '');
@@ -533,7 +529,7 @@ function handleDoubleClick(event) {
     // 갤러리 모드일 때는 더블 클릭 무시
     if (isGalleryMode) return;
     
-    const currentTime = performance.now(); // Date.now() 대신 performance.now() 사용
+    const currentTime = performance.now(); 
     
     // 더블 클릭 감지 (300ms 이내)
     if (currentTime - lastClickTime < DOUBLE_CLICK_DELAY) {
@@ -558,7 +554,7 @@ function handleDoubleClick(event) {
 
 // 선택 메뉴 표시
 function showSelectionMenu(event) {
-    if (isMenuMode || isGalleryMode) return; // 이미 메뉴 모드이거나 갤러리 모드면 무시
+    if (isMenuMode || isGalleryMode) return;
     
     isMenuMode = true;
     
@@ -664,7 +660,7 @@ function hideSelectionMenu() {
                 selectionMenu.remove();
                 selectionMenu = null;
             }
-        }, 400); // transition duration과 맞춤
+        }, 400); 
     }
 }
 
@@ -732,7 +728,6 @@ function startImageGallery(event, type = 'official') {
     } else if (type === 'fanwork') {
         imageList = [...fanWorkImages];
     } else {
-        // 기본값 (기존 호환성)
         if (imageList.length === 0) {
             initializeImageList();
             imageList = [...officialImages, ...fanWorkImages];
@@ -823,17 +818,17 @@ function showNextImage() {
     }
 }
 
-// 이미지 표시 함수 (DOM 조작 최소화)
+// 이미지 표시 함수 
 function displayImage(src, imgElement) {
     if (!isGalleryMode || !imageContainer) return;
     
-    // 기존 이미지 제거 (배치 처리)
+    // 기존 이미지 제거 
     const existingImg = imageContainer.querySelector('.gallery-image');
     const hasExistingImg = !!existingImg;
     
     if (existingImg) {
         existingImg.classList.add('fade-out');
-        // 애니메이션 완료 후 제거 (600ms = fade-out 애니메이션 시간)
+        // 애니메이션 완료 후 제거
         requestAnimationFrame(() => {
             setTimeout(() => {
                 if (existingImg.parentNode) {
@@ -868,7 +863,7 @@ function displayImage(src, imgElement) {
     };
     
     if (hasExistingImg) {
-        // 기존 이미지가 있으면 fade-out 완료 후 추가 (600ms)
+        // 기존 이미지가 있으면 fade-out 완료 후 추가 
         requestAnimationFrame(() => {
             setTimeout(() => {
                 addNewImage();
@@ -979,7 +974,7 @@ function displayCredits() {
         creditsScroll.appendChild(artistItem);
     });
     
-    // 크레딧 스크롤 시간 계산 (작가 수에 따라 조정)
+    // 크레딧 스크롤 시간 계산 
     const scrollDuration = Math.max(5000, uniqueArtists.size * 2000 + 3000);
     
     // CSS 변수로 애니메이션 duration 설정
@@ -1094,13 +1089,13 @@ function returnToMainPage() {
         }, 300);
     }
     
-    // 갤러리 모드 해제 (원형 마스크 역방향 애니메이션)
+    // 갤러리 모드 해제
     const body = document.body;
     body.classList.remove('gallery-mode');
     body.classList.remove('menu-mode'); // 메뉴 모드 클래스도 제거
     body.classList.add('gallery-exit');
     
-    // 이미지 컨테이너도 배경과 함께 서서히 사라지게 (1초 = 배경 애니메이션 시간)
+    // 이미지 컨테이너도 배경과 함께 서서히 사라지게
     if (imageContainer) {
         // 이미지 컨테이너 내부의 모든 이미지에 fade-out 적용
         const images = imageContainer.querySelectorAll('.gallery-image');
@@ -1133,8 +1128,7 @@ function returnToMainPage() {
         body.classList.remove('gallery-exit');
     }, 1000);
     
-    // 프리로드 캐시 정리 (선택적)
-    // preloadedImages.clear(); // 필요시 주석 해제
+    // 프리로드 캐시 정리
 }
 
 // 이벤트 리스너
