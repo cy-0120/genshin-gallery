@@ -861,6 +861,8 @@ body.gallery-exit::before {
     will-change: transform, opacity;
     backface-visibility: hidden;
     transform: translateZ(0);
+    line-height: 1.4;
+    text-align: center;
 }
 
 .selection-button:hover {
@@ -872,6 +874,12 @@ body.gallery-exit::before {
 
 .selection-button:active {
     transform: translateY(-1px) scale(1.02);
+}
+
+.selection-button .button-subtitle {
+    font-size: 0.6em;
+    opacity: 0.85;
+    letter-spacing: 1px;
 }
 
 .home-button {

@@ -555,7 +555,7 @@ function showSelectionMenu(event) {
         // 공식 버튼
         const officialButton = document.createElement('button');
         officialButton.className = 'selection-button';
-        officialButton.textContent = '공식 (Official)';
+        officialButton.innerHTML = '공식 <span class="button-subtitle">(Official)</span>';
         officialButton.addEventListener('click', () => {
             hideSelectionMenu();
             startImageGallery(event, 'official');
@@ -564,7 +564,7 @@ function showSelectionMenu(event) {
         // 2차 창작 버튼
         const fanWorkButton = document.createElement('button');
         fanWorkButton.className = 'selection-button';
-        fanWorkButton.textContent = '2차 창작 (Fan Work)';
+        fanWorkButton.innerHTML = '2차 창작<br><span class="button-subtitle">(Fan Work)</span>';
         fanWorkButton.addEventListener('click', () => {
             hideSelectionMenu();
             startImageGallery(event, 'fanwork');
