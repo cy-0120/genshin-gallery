@@ -349,22 +349,33 @@ let galleryTimeout = null;
 let imageContainer = null; // 이미지 컨테이너 캐싱
 let preloadedImages = new Map(); // 프리로드된 이미지 캐시
 
+// 이미지 작가 정보 매핑 (파일명: 작가명)
+const imageArtistMap = {
+    'qiqi-ice.jpg': 'unknown',
+    // 추가 이미지 작가 정보를 여기에 추가
+    // 'image2.jpg': '작가명2',
+    // 'image3.jpg': '작가명3',
+};
+
 // 이미지 목록 초기화 (img 폴더의 이미지들)
-// 실제 이미지 파일명과 출처 정보에 맞게 수정 필요
+// 이미지 파일 경로만 추가하면 됩니다
 function initializeImageList() {
-    imageList = [
-        {
-            path: '/img/qiqi-ice.jpg',
-            artist: '작가명',
-            source: '출처'
-        },
-        // 추가 이미지가 있다면 여기에 추가
-        // {
-        //     path: '/img/image2.jpg',
-        //     artist: '작가명2',
-        //     source: '출처2'
-        // },
+    const imagePaths = [
+        '/img/qiqi-ice.jpg',
+        // 추가 이미지가 있다면 여기에 경로만 추가
+        // '/img/image2.jpg',
+        // '/img/image3.jpg',
     ];
+    
+    // 이미지 경로를 객체 배열로 변환
+    imageList = imagePaths.map(path => {
+        const fileName = path.split('/').pop(); // 파일명 추출
+        return {
+            path: path,
+            artist: imageArtistMap[fileName] || null,
+            source: null
+        };
+    });
 }
 
 // 더블 클릭 감지
@@ -586,21 +597,25 @@ function displayImage(src, imgElement) {
 
 // 출처 표시
 function showCredits() {
-    if (!isGalleryMode || !imageContainer) return;
+    if (!isGalleryMode) return;
     
     // 기존 이미지 제거
-    const existingImg = imageContainer.querySelector('.gallery-image');
-    if (existingImg) {
-        existingImg.classList.add('fade-out');
-        requestAnimationFrame(() => {
-            setTimeout(() => {
-                if (existingImg.parentNode) {
-                    existingImg.remove();
-                }
-                // 이미지 제거 후 출처 표시
-                displayCredits();
-            }, 600);
-        });
+    if (imageContainer) {
+        const existingImg = imageContainer.querySelector('.gallery-image');
+        if (existingImg) {
+            existingImg.classList.add('fade-out');
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    if (existingImg.parentNode) {
+                        existingImg.remove();
+                    }
+                    // 이미지 제거 후 출처 표시
+                    displayCredits();
+                }, 600);
+            });
+        } else {
+            displayCredits();
+        }
     } else {
         displayCredits();
     }
@@ -608,30 +623,37 @@ function showCredits() {
 
 // 출처 정보 표시
 function displayCredits() {
-    if (!isGalleryMode || !imageContainer) return;
+    if (!isGalleryMode) return;
     
-    // 출처 컨테이너 생성
-    const creditsContainer = document.createElement('div');
-    creditsContainer.className = 'gallery-credits';
+    // 이미지 컨테이너 숨기기
+    if (imageContainer) {
+        imageContainer.style.display = 'none';
+    }
+    
+    // 크레딧 페이지 컨테이너 생성
+    const creditsPage = document.createElement('div');
+    creditsPage.className = 'credits-page';
+    document.body.appendChild(creditsPage);
+    
+    // 크레딧 스크롤 컨테이너
+    const creditsScroll = document.createElement('div');
+    creditsScroll.className = 'credits-scroll';
+    creditsPage.appendChild(creditsScroll);
     
     // 제목
     const title = document.createElement('div');
     title.className = 'credits-title';
     title.textContent = '이미지 출처';
-    creditsContainer.appendChild(title);
-    
-    // 작가 목록
-    const artistsList = document.createElement('div');
-    artistsList.className = 'credits-artists';
+    creditsScroll.appendChild(title);
     
     // 중복 제거를 위한 Set 사용
     const uniqueArtists = new Set();
     const artistSourceMap = new Map();
     
     usedImages.forEach(imgObj => {
-        if (imgObj.artist && imgObj.artist !== '작가명') {
+        if (imgObj.artist && imgObj.artist !== '작가명' && imgObj.artist.trim() !== '') {
             uniqueArtists.add(imgObj.artist);
-            if (imgObj.source && imgObj.source !== '출처') {
+            if (imgObj.source && imgObj.source !== '출처' && imgObj.source.trim() !== '') {
                 artistSourceMap.set(imgObj.artist, imgObj.source);
             }
         }
@@ -639,6 +661,10 @@ function displayCredits() {
     
     if (uniqueArtists.size === 0) {
         // 출처 정보가 없으면 바로 복귀
+        creditsPage.remove();
+        if (imageContainer) {
+            imageContainer.style.display = '';
+        }
         setTimeout(() => {
             returnToMainPage();
         }, 1000);
@@ -650,43 +676,49 @@ function displayCredits() {
         const artistItem = document.createElement('div');
         artistItem.className = 'credits-artist-item';
         
-        const artistName = document.createElement('span');
+        const artistName = document.createElement('div');
         artistName.className = 'credits-artist-name';
         artistName.textContent = artist;
         artistItem.appendChild(artistName);
         
         const source = artistSourceMap.get(artist);
         if (source) {
-            const sourceText = document.createElement('span');
+            const sourceText = document.createElement('div');
             sourceText.className = 'credits-source';
-            sourceText.textContent = ` - ${source}`;
+            sourceText.textContent = source;
             artistItem.appendChild(sourceText);
         }
         
-        artistsList.appendChild(artistItem);
+        creditsScroll.appendChild(artistItem);
     });
     
-    creditsContainer.appendChild(artistsList);
+    // 크레딧 스크롤 시간 계산 (작가 수에 따라 조정)
+    const scrollDuration = Math.max(5000, uniqueArtists.size * 2000 + 3000);
     
-    // 출처 컨테이너 추가
-    imageContainer.appendChild(creditsContainer);
+    // CSS 변수로 애니메이션 duration 설정
+    creditsScroll.style.setProperty('--credits-duration', `${scrollDuration}ms`);
     
-    // 페이드 인 애니메이션
+    // 크레딧 페이지 표시
     requestAnimationFrame(() => {
-        creditsContainer.classList.add('fade-in');
+        creditsPage.classList.add('active');
+        // 약간의 딜레이 후 스크롤 시작
+        setTimeout(() => {
+            creditsScroll.classList.add('scroll-up');
+        }, 100);
     });
     
-    // 4초 후 원래 페이지로 복귀
+    // 크레딧이 모두 올라간 후 원래 페이지로 복귀
     setTimeout(() => {
-        if (creditsContainer.parentNode) {
-            creditsContainer.classList.add('fade-out');
-            setTimeout(() => {
-                returnToMainPage();
-            }, 600);
-        } else {
+        creditsPage.classList.remove('active');
+        creditsPage.classList.add('fade-out');
+        setTimeout(() => {
+            creditsPage.remove();
+            if (imageContainer) {
+                imageContainer.style.display = '';
+            }
             returnToMainPage();
-        }
-    }, 4000);
+        }, 1000);
+    }, scrollDuration + 1000);
 }
 
 // 원래 페이지로 복귀
