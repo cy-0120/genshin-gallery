@@ -342,12 +342,16 @@ function createRipple(event) {
 
 // 이미지 갤러리 관련 변수
 let isGalleryMode = false;
-let imageList = []; // 이미지 목록 (img 폴더의 이미지들)
+let isMenuMode = false; // 선택 메뉴 모드
+let imageList = []; // 현재 사용할 이미지 목록
+let officialImages = []; // 공식 이미지 목록
+let fanWorkImages = []; // 2차 창작 이미지 목록
 let currentImageIndex = 0;
 let usedImages = []; // 사용된 이미지 추적
 let galleryTimeout = null;
 let imageContainer = null; // 이미지 컨테이너 캐싱
 let preloadedImages = new Map(); // 프리로드된 이미지 캐시
+let selectionMenu = null; // 선택 메뉴 요소
 
 // 이미지 작가 정보 매핑 (파일명: 작가명)
 const imageArtistMap = {
@@ -357,25 +361,144 @@ const imageArtistMap = {
     'Nahida-grass.jpg': '@niyone09',
 };
 
-// 이미지 목록 초기화 (img 폴더의 이미지들)
-// 이미지 파일 경로만 추가하면 됩니다
-function initializeImageList() {
+// 공식 이미지 목록 초기화
+function initializeOfficialImages() {
     const imagePaths = [
-        '/img/qiqi-ice.jpg',
-        '/img/qiqi ver.2-ice.jpg',
-        '/img/Nahida-grass.jpg',
-        '/img/Lynette-wind.jpg'
+        // Genshin offcial 폴더
+        '/offcialIMG/Genshin offcial/1000009172.png',
+        '/offcialIMG/Genshin offcial/1000009173.webp',
+        '/offcialIMG/Genshin offcial/1000009175.webp',
+        '/offcialIMG/Genshin offcial/1000009176.webp',
+        '/offcialIMG/Genshin offcial/1000009177.webp',
+        '/offcialIMG/Genshin offcial/1000009178.webp',
+        '/offcialIMG/Genshin offcial/1000009179.webp',
+        '/offcialIMG/Genshin offcial/1000009180.webp',
+        '/offcialIMG/Genshin offcial/1000009181.webp',
+        '/offcialIMG/Genshin offcial/1000009182.webp',
+        '/offcialIMG/Genshin offcial/1000009183.webp',
+        '/offcialIMG/Genshin offcial/1000009184.webp',
+        '/offcialIMG/Genshin offcial/1000009185.webp',
+        '/offcialIMG/Genshin offcial/1000009186.webp',
+        '/offcialIMG/Genshin offcial/1000009187.webp',
+        // Gneshinillust 폴더
+        '/offcialIMG/Gneshinillust/1000009189.jpg',
+        '/offcialIMG/Gneshinillust/1000009190.jpg',
+        '/offcialIMG/Gneshinillust/1000009191.jpg',
+        '/offcialIMG/Gneshinillust/1000009192.jpg',
+        '/offcialIMG/Gneshinillust/1000009193.jpg',
+        '/offcialIMG/Gneshinillust/1000009194.jpg',
+        '/offcialIMG/Gneshinillust/1000009195.jpg',
+        '/offcialIMG/Gneshinillust/1000009196.jpg',
+        '/offcialIMG/Gneshinillust/1000009197.jpg',
+        '/offcialIMG/Gneshinillust/1000009198.jpg',
+        '/offcialIMG/Gneshinillust/1000009199.jpg',
+        '/offcialIMG/Gneshinillust/1000009200.jpg',
+        '/offcialIMG/Gneshinillust/1000009201.jpg',
+        '/offcialIMG/Gneshinillust/1000009202.jpg',
+        '/offcialIMG/Gneshinillust/1000009203.jpg',
+        '/offcialIMG/Gneshinillust/1000009204.jpg',
+        '/offcialIMG/Gneshinillust/1000009205.jpg',
+        '/offcialIMG/Gneshinillust/1000009206.jpg',
+        '/offcialIMG/Gneshinillust/1000009207.jpg',
+        '/offcialIMG/Gneshinillust/1000009208.jpg',
+        '/offcialIMG/Gneshinillust/1000009209.jpg',
+        '/offcialIMG/Gneshinillust/1000009210.jpg',
+        '/offcialIMG/Gneshinillust/1000009211.jpg',
+        '/offcialIMG/Gneshinillust/1000009212.jpg',
+        '/offcialIMG/Gneshinillust/1000009213.jpg',
+        '/offcialIMG/Gneshinillust/1000009214.jpg',
+        '/offcialIMG/Gneshinillust/1000009215.jpg',
+        '/offcialIMG/Gneshinillust/1000009216.jpg',
+        '/offcialIMG/Gneshinillust/1000009217.jpg',
+        '/offcialIMG/Gneshinillust/1000009218.jpg',
     ];
     
-    // 이미지 경로를 객체 배열로 변환
-    imageList = imagePaths.map(path => {
-        const fileName = path.split('/').pop(); // 파일명 추출
+    officialImages = imagePaths.map(path => {
+        const fileName = path.split('/').pop();
         return {
             path: path,
             artist: imageArtistMap[fileName] || null,
             source: null
         };
     });
+}
+
+// 2차 창작 이미지 목록 초기화
+function initializeFanWorkImages() {
+    const imagePaths = [
+        // @kikokiko612 폴더
+        '/fan work/@kikokiko612/1000009219.webp',
+        '/fan work/@kikokiko612/1000009220.webp',
+        '/fan work/@kikokiko612/1000009221.webp',
+        '/fan work/@kikokiko612/1000009222.webp',
+        '/fan work/@kikokiko612/1000009223.webp',
+        '/fan work/@kikokiko612/1000009224.webp',
+        '/fan work/@kikokiko612/1000009225.webp',
+        '/fan work/@kikokiko612/1000009226.webp',
+        '/fan work/@kikokiko612/1000009227.webp',
+        '/fan work/@kikokiko612/1000009228.webp',
+        // @niyone09 폴더
+        '/fan work/@niyone09/1000009166.jpg',
+        '/fan work/@niyone09/1000009170.jpg',
+        '/fan work/@niyone09/1000009171.jpg',
+        // Unknown 폴더
+        '/fan work/Unknown/1000006240.jpg',
+        '/fan work/Unknown/1000006346.webp',
+        '/fan work/Unknown/1000006348.jpg',
+        '/fan work/Unknown/1000006472.webp',
+        '/fan work/Unknown/1000006735.jpg',
+        '/fan work/Unknown/1000006736.jpg',
+        '/fan work/Unknown/1000007998.jpg',
+        '/fan work/Unknown/1000008000.png',
+        '/fan work/Unknown/1000008001.webp',
+        '/fan work/Unknown/1000008002.jpg',
+        '/fan work/Unknown/1000008003.webp',
+        '/fan work/Unknown/1000008877.jpg',
+        '/fan work/Unknown/1000008878.jpg',
+        '/fan work/Unknown/1000008879.webp',
+        '/fan work/Unknown/1000008882.webp',
+        '/fan work/Unknown/1000008883.webp',
+        '/fan work/Unknown/1000008886.jpg',
+        '/fan work/Unknown/1000008887.jpg',
+        '/fan work/Unknown/1000008888.jpg',
+        '/fan work/Unknown/1000008889.jpg',
+        '/fan work/Unknown/1000008890.webp',
+        '/fan work/Unknown/1000008891.jpg',
+        '/fan work/Unknown/1000008892.jpg',
+        '/fan work/Unknown/1000008893.jpg',
+        '/fan work/Unknown/1000008894.jpg',
+        '/fan work/Unknown/1000008896.jpg',
+        '/fan work/Unknown/1000008897.png',
+        '/fan work/Unknown/1000008898.jpg',
+        '/fan work/Unknown/1000008899.webp',
+        '/fan work/Unknown/1000008900.jpg',
+        '/fan work/Unknown/1000008901.webp',
+        '/fan work/Unknown/1000008902.jpg',
+    ];
+    
+    fanWorkImages = imagePaths.map(path => {
+        const fileName = path.split('/').pop();
+        // 폴더명에서 작가명 추출
+        const folderName = path.split('/')[2]; // 'fan work/@kikokiko612/...' 형식
+        let artist = null;
+        if (folderName && folderName !== 'Unknown') {
+            artist = folderName.replace('@', '');
+        } else if (folderName === 'Unknown') {
+            artist = 'unknown';
+        }
+        
+        return {
+            path: path,
+            artist: artist || imageArtistMap[fileName] || null,
+            source: null
+        };
+    });
+}
+
+// 이미지 목록 초기화 
+function initializeImageList() {
+    initializeOfficialImages();
+    initializeFanWorkImages();
 }
 
 // 더블 클릭 감지
@@ -392,7 +515,7 @@ function handleDoubleClick(event) {
             clearTimeout(clickTimeout);
             clickTimeout = null;
         }
-        startImageGallery(event);
+        showSelectionMenu(event);
         lastClickTime = 0; // 더블 클릭 처리 후 리셋
     } else {
         lastClickTime = currentTime;
@@ -404,6 +527,86 @@ function handleDoubleClick(event) {
             createRipple(event);
             clickTimeout = null;
         }, DOUBLE_CLICK_DELAY);
+    }
+}
+
+// 선택 메뉴 표시
+function showSelectionMenu(event) {
+    if (isMenuMode || isGalleryMode) return; // 이미 메뉴 모드이거나 갤러리 모드면 무시
+    
+    isMenuMode = true;
+    
+    // 이미지 목록 초기화
+    if (officialImages.length === 0 || fanWorkImages.length === 0) {
+        initializeImageList();
+    }
+    
+    // 제목 숨기기
+    document.body.classList.add('menu-mode');
+    
+    // 선택 메뉴 생성
+    if (!selectionMenu) {
+        selectionMenu = document.createElement('div');
+        selectionMenu.className = 'selection-menu';
+        
+        const buttonsContainer = document.createElement('div');
+        buttonsContainer.className = 'selection-buttons';
+        
+        // 공식 버튼
+        const officialButton = document.createElement('button');
+        officialButton.className = 'selection-button';
+        officialButton.textContent = '공식 (Official)';
+        officialButton.addEventListener('click', () => {
+            hideSelectionMenu();
+            startImageGallery(event, 'official');
+        });
+        
+        // 2차 창작 버튼
+        const fanWorkButton = document.createElement('button');
+        fanWorkButton.className = 'selection-button';
+        fanWorkButton.textContent = '2차 창작 (Fan Work)';
+        fanWorkButton.addEventListener('click', () => {
+            hideSelectionMenu();
+            startImageGallery(event, 'fanwork');
+        });
+        
+        buttonsContainer.appendChild(officialButton);
+        buttonsContainer.appendChild(fanWorkButton);
+        
+        // 홈으로 돌아가기 버튼
+        const homeButton = document.createElement('button');
+        homeButton.className = 'home-button';
+        homeButton.textContent = '홈으로 돌아가기';
+        homeButton.addEventListener('click', () => {
+            hideSelectionMenu();
+        });
+        
+        selectionMenu.appendChild(buttonsContainer);
+        selectionMenu.appendChild(homeButton);
+        document.body.appendChild(selectionMenu);
+    }
+    
+    // 메뉴 표시
+    requestAnimationFrame(() => {
+        selectionMenu.classList.add('active');
+    });
+}
+
+// 선택 메뉴 숨기기
+function hideSelectionMenu() {
+    if (!isMenuMode) return;
+    
+    isMenuMode = false;
+    document.body.classList.remove('menu-mode');
+    
+    if (selectionMenu) {
+        selectionMenu.classList.remove('active');
+        setTimeout(() => {
+            if (selectionMenu && !selectionMenu.classList.contains('active')) {
+                selectionMenu.remove();
+                selectionMenu = null;
+            }
+        }, 400); // transition duration과 맞춤
     }
 }
 
@@ -425,7 +628,7 @@ function preloadImage(src) {
 }
 
 // 이미지 갤러리 시작
-function startImageGallery(event) {
+function startImageGallery(event, type = 'official') {
     if (isGalleryMode) return; // 이미 갤러리 모드면 무시
     
     isGalleryMode = true;
@@ -447,9 +650,17 @@ function startImageGallery(event) {
     const body = document.body;
     body.classList.add('gallery-mode');
     
-    // 이미지 목록이 비어있으면 초기화
-    if (imageList.length === 0) {
-        initializeImageList();
+    // 선택된 타입에 따라 이미지 목록 설정
+    if (type === 'official') {
+        imageList = [...officialImages];
+    } else if (type === 'fanwork') {
+        imageList = [...fanWorkImages];
+    } else {
+        // 기본값 (기존 호환성)
+        if (imageList.length === 0) {
+            initializeImageList();
+            imageList = [...officialImages, ...fanWorkImages];
+        }
     }
     
     // 사용된 이미지 초기화
@@ -739,6 +950,7 @@ function returnToMainPage() {
     if (!isGalleryMode) return;
     
     isGalleryMode = false;
+    isMenuMode = false; // 메뉴 모드도 해제
     
     // 타이머 정리
     if (galleryTimeout) {
@@ -749,6 +961,7 @@ function returnToMainPage() {
     // 갤러리 모드 해제 (원형 마스크 역방향 애니메이션)
     const body = document.body;
     body.classList.remove('gallery-mode');
+    body.classList.remove('menu-mode'); // 메뉴 모드 클래스도 제거
     body.classList.add('gallery-exit');
     
     // 이미지 컨테이너도 배경과 함께 서서히 사라지게 (1초 = 배경 애니메이션 시간)
