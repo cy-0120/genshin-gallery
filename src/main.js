@@ -709,20 +709,35 @@ function displayCredits() {
     
     // 크레딧이 모두 올라간 후 원래 페이지로 복귀
     setTimeout(() => {
+        // 크레딧 페이지 fade-out과 동시에 원래 페이지가 서서히 나타나도록
         creditsPage.classList.remove('active');
         creditsPage.classList.add('fade-out');
+        
+        // 원래 페이지가 서서히 나타나도록 gallery-exit 애니메이션 시작
+        const body = document.body;
+        body.classList.remove('gallery-mode');
+        body.classList.add('gallery-exit');
+        
+        // 크레딧 페이지 제거 및 정리
         setTimeout(() => {
             creditsPage.remove();
             if (imageContainer) {
                 imageContainer.style.display = '';
             }
-            returnToMainPage();
+            // 애니메이션 완료 후 클래스 제거
+            setTimeout(() => {
+                body.classList.remove('gallery-exit');
+                isGalleryMode = false;
+            }, 1000);
         }, 1000);
     }, scrollDuration + 1000);
 }
 
 // 원래 페이지로 복귀
 function returnToMainPage() {
+    // 이미 복귀 중이면 무시
+    if (!isGalleryMode) return;
+    
     isGalleryMode = false;
     
     // 타이머 정리
