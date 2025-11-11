@@ -624,7 +624,7 @@ body.gallery-mode::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background: var(--color-bg);
+    background: transparent;
     clip-path: circle(0% at var(--gallery-click-x, 50%) var(--gallery-click-y, 50%));
     animation: gallery-mask-expand 0.8s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
     z-index: 100;
@@ -917,5 +917,53 @@ body.menu-mode .title {
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.4s ease;
+}
+
+/* 나가기 버튼 */
+.gallery-exit-button {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 200;
+    padding: 12px 24px;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+    opacity: 0;
+    pointer-events: none;
+}
+
+body.gallery-mode .gallery-exit-button {
+    opacity: 1;
+    pointer-events: all;
+    animation: fade-in-button 0.5s ease 0.8s forwards;
+}
+
+.gallery-exit-button:hover {
+    background: rgba(0, 0, 0, 0.8);
+    border-color: rgba(255, 255, 255, 0.6);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.gallery-exit-button:active {
+    transform: translateY(0);
+}
+
+@keyframes fade-in-button {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 

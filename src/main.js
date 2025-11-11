@@ -352,6 +352,7 @@ let galleryTimeout = null;
 let imageContainer = null; // 이미지 컨테이너 캐싱
 let preloadedImages = new Map(); // 프리로드된 이미지 캐시
 let selectionMenu = null; // 선택 메뉴 요소
+let exitButton = null; // 나가기 버튼
 
 // 이미지 작가 정보 매핑 (파일명: 작가명)
 const imageArtistMap = {
@@ -650,6 +651,17 @@ function startImageGallery(event, type = 'official') {
     const body = document.body;
     body.classList.add('gallery-mode');
     
+    // 나가기 버튼 생성 및 추가
+    if (!exitButton) {
+        exitButton = document.createElement('button');
+        exitButton.className = 'gallery-exit-button';
+        exitButton.textContent = 'Exit';
+        exitButton.addEventListener('click', () => {
+            returnToSelectionMenu();
+        });
+        document.body.appendChild(exitButton);
+    }
+    
     // 선택된 타입에 따라 이미지 목록 설정
     if (type === 'official') {
         imageList = [...officialImages];
@@ -944,6 +956,55 @@ function displayCredits() {
     }, scrollDuration + 1000);
 }
 
+// 선택 메뉴로 복귀
+function returnToSelectionMenu() {
+    if (!isGalleryMode) return;
+    
+    // 갤러리 모드 해제
+    isGalleryMode = false;
+    
+    // 타이머 정리
+    if (galleryTimeout) {
+        clearTimeout(galleryTimeout);
+        galleryTimeout = null;
+    }
+    
+    // 이미지 컨테이너 제거
+    if (imageContainer) {
+        const images = imageContainer.querySelectorAll('.gallery-image');
+        images.forEach(img => {
+            img.classList.add('fade-out');
+        });
+        setTimeout(() => {
+            if (imageContainer && imageContainer.parentNode) {
+                imageContainer.remove();
+                imageContainer = null;
+            }
+        }, 600);
+    }
+    
+    // 나가기 버튼 제거
+    if (exitButton) {
+        exitButton.style.opacity = '0';
+        setTimeout(() => {
+            if (exitButton && exitButton.parentNode) {
+                exitButton.remove();
+                exitButton = null;
+            }
+        }, 300);
+    }
+    
+    // 갤러리 모드 해제
+    const body = document.body;
+    body.classList.remove('gallery-mode');
+    body.classList.remove('gallery-exit');
+    
+    // 선택 메뉴 다시 표시
+    setTimeout(() => {
+        showSelectionMenu({ clientX: window.innerWidth / 2, clientY: window.innerHeight / 2 });
+    }, 500);
+}
+
 // 원래 페이지로 복귀
 function returnToMainPage() {
     // 이미 복귀 중이면 무시
@@ -956,6 +1017,17 @@ function returnToMainPage() {
     if (galleryTimeout) {
         clearTimeout(galleryTimeout);
         galleryTimeout = null;
+    }
+    
+    // 나가기 버튼 제거
+    if (exitButton) {
+        exitButton.style.opacity = '0';
+        setTimeout(() => {
+            if (exitButton && exitButton.parentNode) {
+                exitButton.remove();
+                exitButton = null;
+            }
+        }, 300);
     }
     
     // 갤러리 모드 해제 (원형 마스크 역방향 애니메이션)
