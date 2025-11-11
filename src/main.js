@@ -350,13 +350,20 @@ let imageContainer = null; // 이미지 컨테이너 캐싱
 let preloadedImages = new Map(); // 프리로드된 이미지 캐시
 
 // 이미지 목록 초기화 (img 폴더의 이미지들)
-// 실제 이미지 파일명에 맞게 수정 필요
+// 실제 이미지 파일명과 출처 정보에 맞게 수정 필요
 function initializeImageList() {
     imageList = [
-        '/img/qiqi-ice.jpg',
+        {
+            path: '/img/qiqi-ice.jpg',
+            artist: '작가명',
+            source: '출처'
+        },
         // 추가 이미지가 있다면 여기에 추가
-        // '/img/image2.jpg',
-        // '/img/image3.jpg',
+        // {
+        //     path: '/img/image2.jpg',
+        //     artist: '작가명2',
+        //     source: '출처2'
+        // },
     ];
 }
 
@@ -439,8 +446,8 @@ function startImageGallery(event) {
     
     // 이미지 프리로드 시작
     if (imageList.length > 0) {
-        imageList.forEach(imgSrc => {
-            preloadImage(imgSrc).catch(() => {
+        imageList.forEach(imgObj => {
+            preloadImage(imgObj.path).catch(() => {
                 // 이미지 로드 실패 시 무시
             });
         });
@@ -458,33 +465,33 @@ function startImageGallery(event) {
 function showNextImage() {
     if (!isGalleryMode) return;
     
-    // 사용 가능한 이미지가 없으면 원래 페이지로 복귀
+    // 사용 가능한 이미지가 없으면 출처 표시 후 원래 페이지로 복귀
     if (usedImages.length >= imageList.length) {
-        returnToMainPage();
+        showCredits();
         return;
     }
     
     // 사용되지 않은 이미지 중 랜덤 선택 (filter 대신 직접 계산)
     const availableCount = imageList.length - usedImages.length;
     if (availableCount === 0) {
-        returnToMainPage();
+        showCredits();
         return;
     }
     
     let randomIndex;
-    let selectedImage;
+    let selectedImageObj;
     let attempts = 0;
     const maxAttempts = 100; // 무한 루프 방지
     
     // 중복되지 않는 이미지 선택
     do {
         randomIndex = Math.floor(Math.random() * imageList.length);
-        selectedImage = imageList[randomIndex];
+        selectedImageObj = imageList[randomIndex];
         attempts++;
-    } while (usedImages.includes(selectedImage) && attempts < maxAttempts);
+    } while (usedImages.some(used => used.path === selectedImageObj.path) && attempts < maxAttempts);
     
     // 사용된 이미지 목록에 추가
-    usedImages.push(selectedImage);
+    usedImages.push(selectedImageObj);
     currentImageIndex = usedImages.length - 1;
     
     // 이미지 컨테이너 생성 또는 업데이트 (캐싱 활용)
@@ -496,16 +503,16 @@ function showNextImage() {
     }
     
     // 프리로드된 이미지 사용 또는 새로 로드
-    const preloadedImg = preloadedImages.get(selectedImage);
+    const preloadedImg = preloadedImages.get(selectedImageObj.path);
     
     if (preloadedImg && preloadedImg.complete) {
         // 프리로드된 이미지 사용
-        displayImage(selectedImage, preloadedImg);
+        displayImage(selectedImageObj.path, preloadedImg);
     } else {
         // 이미지 로드 후 표시
-        preloadImage(selectedImage).then((img) => {
+        preloadImage(selectedImageObj.path).then((img) => {
             if (isGalleryMode) {
-                displayImage(selectedImage, img);
+                displayImage(selectedImageObj.path, img);
             }
         }).catch(() => {
             // 이미지 로드 실패 시 다음 이미지로
@@ -577,6 +584,111 @@ function displayImage(src, imgElement) {
     }
 }
 
+// 출처 표시
+function showCredits() {
+    if (!isGalleryMode || !imageContainer) return;
+    
+    // 기존 이미지 제거
+    const existingImg = imageContainer.querySelector('.gallery-image');
+    if (existingImg) {
+        existingImg.classList.add('fade-out');
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                if (existingImg.parentNode) {
+                    existingImg.remove();
+                }
+                // 이미지 제거 후 출처 표시
+                displayCredits();
+            }, 600);
+        });
+    } else {
+        displayCredits();
+    }
+}
+
+// 출처 정보 표시
+function displayCredits() {
+    if (!isGalleryMode || !imageContainer) return;
+    
+    // 출처 컨테이너 생성
+    const creditsContainer = document.createElement('div');
+    creditsContainer.className = 'gallery-credits';
+    
+    // 제목
+    const title = document.createElement('div');
+    title.className = 'credits-title';
+    title.textContent = '이미지 출처';
+    creditsContainer.appendChild(title);
+    
+    // 작가 목록
+    const artistsList = document.createElement('div');
+    artistsList.className = 'credits-artists';
+    
+    // 중복 제거를 위한 Set 사용
+    const uniqueArtists = new Set();
+    const artistSourceMap = new Map();
+    
+    usedImages.forEach(imgObj => {
+        if (imgObj.artist && imgObj.artist !== '작가명') {
+            uniqueArtists.add(imgObj.artist);
+            if (imgObj.source && imgObj.source !== '출처') {
+                artistSourceMap.set(imgObj.artist, imgObj.source);
+            }
+        }
+    });
+    
+    if (uniqueArtists.size === 0) {
+        // 출처 정보가 없으면 바로 복귀
+        setTimeout(() => {
+            returnToMainPage();
+        }, 1000);
+        return;
+    }
+    
+    // 작가 정보 표시
+    uniqueArtists.forEach(artist => {
+        const artistItem = document.createElement('div');
+        artistItem.className = 'credits-artist-item';
+        
+        const artistName = document.createElement('span');
+        artistName.className = 'credits-artist-name';
+        artistName.textContent = artist;
+        artistItem.appendChild(artistName);
+        
+        const source = artistSourceMap.get(artist);
+        if (source) {
+            const sourceText = document.createElement('span');
+            sourceText.className = 'credits-source';
+            sourceText.textContent = ` - ${source}`;
+            artistItem.appendChild(sourceText);
+        }
+        
+        artistsList.appendChild(artistItem);
+    });
+    
+    creditsContainer.appendChild(artistsList);
+    
+    // 출처 컨테이너 추가
+    imageContainer.appendChild(creditsContainer);
+    
+    // 페이드 인 애니메이션
+    requestAnimationFrame(() => {
+        creditsContainer.classList.add('fade-in');
+    });
+    
+    // 4초 후 원래 페이지로 복귀
+    setTimeout(() => {
+        if (creditsContainer.parentNode) {
+            creditsContainer.classList.add('fade-out');
+            setTimeout(() => {
+                returnToMainPage();
+            }, 600);
+        } else {
+            returnToMainPage();
+        }
+    }, 4000);
+}
+
 // 원래 페이지로 복귀
 function returnToMainPage() {
     isGalleryMode = false;
@@ -599,6 +711,12 @@ function returnToMainPage() {
         images.forEach(img => {
             img.classList.add('fade-out');
         });
+        
+        // 출처 컨테이너도 fade-out 적용
+        const credits = imageContainer.querySelector('.gallery-credits');
+        if (credits) {
+            credits.classList.add('fade-out');
+        }
         
         // 이미지 컨테이너 자체도 fade-out
         imageContainer.classList.add('fade-out');
