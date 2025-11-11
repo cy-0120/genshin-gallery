@@ -670,6 +670,10 @@ body.gallery-exit::before {
     transform: translateZ(0);
 }
 
+.gallery-image-container.fade-out {
+    animation: image-fade-out 1s ease-out forwards;
+}
+
 .gallery-image {
     max-width: 90%;
     max-height: 90%;

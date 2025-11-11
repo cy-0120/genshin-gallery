@@ -587,23 +587,32 @@ function returnToMainPage() {
         galleryTimeout = null;
     }
     
-    // 이미지 컨테이너 제거 (배치 처리)
+    // 갤러리 모드 해제 (원형 마스크 역방향 애니메이션)
+    const body = document.body;
+    body.classList.remove('gallery-mode');
+    body.classList.add('gallery-exit');
+    
+    // 이미지 컨테이너도 배경과 함께 서서히 사라지게 (1초 = 배경 애니메이션 시간)
     if (imageContainer) {
+        // 이미지 컨테이너 내부의 모든 이미지에 fade-out 적용
+        const images = imageContainer.querySelectorAll('.gallery-image');
+        images.forEach(img => {
+            img.classList.add('fade-out');
+        });
+        
+        // 이미지 컨테이너 자체도 fade-out
         imageContainer.classList.add('fade-out');
+        
+        // 배경 애니메이션과 동시에 시작하여 1초 후 제거
         requestAnimationFrame(() => {
             setTimeout(() => {
                 if (imageContainer.parentNode) {
                     imageContainer.remove();
                 }
                 imageContainer = null; // 참조 제거 (메모리 최적화)
-            }, 500);
+            }, 1000);
         });
     }
-    
-    // 갤러리 모드 해제 (원형 마스크 역방향 애니메이션)
-    const body = document.body;
-    body.classList.remove('gallery-mode');
-    body.classList.add('gallery-exit');
     
     // 애니메이션 완료 후 클래스 제거
     setTimeout(() => {
