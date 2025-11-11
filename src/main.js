@@ -352,9 +352,9 @@ let preloadedImages = new Map(); // 프리로드된 이미지 캐시
 // 이미지 작가 정보 매핑 (파일명: 작가명)
 const imageArtistMap = {
     'qiqi-ice.jpg': 'unknown',
-    // 추가 이미지 작가 정보를 여기에 추가
-    // 'image2.jpg': '작가명2',
-    // 'image3.jpg': '작가명3',
+    '/img/Lynette-wind.jpg': '@niyone09',
+    'img/qiqi ver.2-ice.jpg': '@niyone09',
+    'img/Nahida-grass.jpg': '@niyone09',
 };
 
 // 이미지 목록 초기화 (img 폴더의 이미지들)
@@ -362,9 +362,9 @@ const imageArtistMap = {
 function initializeImageList() {
     const imagePaths = [
         '/img/qiqi-ice.jpg',
-        // 추가 이미지가 있다면 여기에 경로만 추가
-        // '/img/image2.jpg',
-        // '/img/image3.jpg',
+        '/img/qiqi ver.2-ice.jpg',
+        '/img/Nahida-grass.jpg',
+        '/img/Lynette-wind.jpg'
     ];
     
     // 이미지 경로를 객체 배열로 변환
