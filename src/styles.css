@@ -691,7 +691,7 @@ body.gallery-exit::before {
 }
 
 .gallery-image.fade-out {
-    animation: image-fade-out 0.3s ease-in forwards;
+    animation: image-fade-out 0.6s ease-out forwards;
 }
 
 @keyframes image-fade-in {
@@ -712,7 +712,7 @@ body.gallery-exit::before {
     }
     100% {
         opacity: 0;
-        transform: translateZ(0) scale(0.9);
+        transform: translateZ(0) scale(0.95);
     }
 }
 

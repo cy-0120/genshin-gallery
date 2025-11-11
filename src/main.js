@@ -528,12 +528,13 @@ function displayImage(src, imgElement) {
     
     if (existingImg) {
         existingImg.classList.add('fade-out');
+        // 애니메이션 완료 후 제거 (600ms = fade-out 애니메이션 시간)
         requestAnimationFrame(() => {
             setTimeout(() => {
                 if (existingImg.parentNode) {
                     existingImg.remove();
                 }
-            }, 300);
+            }, 600);
         });
     }
     
@@ -562,11 +563,11 @@ function displayImage(src, imgElement) {
     };
     
     if (hasExistingImg) {
-        // 기존 이미지가 있으면 fade-out 완료 후 추가 (300ms)
+        // 기존 이미지가 있으면 fade-out 완료 후 추가 (600ms)
         requestAnimationFrame(() => {
             setTimeout(() => {
                 addNewImage();
-            }, 300);
+            }, 600);
         });
     } else {
         // 기존 이미지가 없으면 바로 추가
