@@ -571,10 +571,15 @@ function showSelectionMenu(event) {
         exitButton = document.createElement('button');
         exitButton.className = 'gallery-exit-button';
         exitButton.textContent = 'Exit';
+        // exit 버튼 클릭 핸들러 - 현재 상태에 따라 적절한 함수 호출
         exitButton.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            hideSelectionMenu();
+            if (isGalleryMode) {
+                returnToSelectionMenu();
+            } else if (isMenuMode) {
+                hideSelectionMenu();
+            }
         }, { passive: false });
         exitButton.style.pointerEvents = 'auto';
         exitButton.style.zIndex = '1000';
@@ -709,15 +714,21 @@ function startImageGallery(event, type = 'official') {
         exitButton = document.createElement('button');
         exitButton.className = 'gallery-exit-button';
         exitButton.textContent = 'Exit';
+        // exit 버튼 클릭 핸들러 - 현재 상태에 따라 적절한 함수 호출
         exitButton.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            returnToSelectionMenu();
+            if (isGalleryMode) {
+                returnToSelectionMenu();
+            } else if (isMenuMode) {
+                hideSelectionMenu();
+            }
         }, { passive: false });
         exitButton.style.pointerEvents = 'auto';
         exitButton.style.zIndex = '1000';
         document.body.appendChild(exitButton);
     } else {
+        // 이미 존재하면 표시 (이벤트 리스너는 이미 적절히 설정되어 있음)
         exitButton.style.pointerEvents = 'auto';
         exitButton.style.zIndex = '1000';
     }
