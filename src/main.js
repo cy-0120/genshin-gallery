@@ -788,71 +788,111 @@ const DISABLED_F12_EMAILS = ['dragon63503514@gmail.com'];
 // F12 비활성화 여부 확인
 function shouldDisableF12() {
     const userEmail = getUserEmail();
-    if (!userEmail) return false;
     
-    return DISABLED_F12_EMAILS.includes(userEmail.toLowerCase().trim());
+    // 이메일이 없으면 기본적으로 F12 비활성화 (모든 사용자)
+    if (!userEmail) return true;
+    
+    // 특정 이메일 목록에 있으면 F12 비활성화
+    if (DISABLED_F12_EMAILS.includes(userEmail.toLowerCase().trim())) {
+        return true;
+    }
+    
+    // 다른 계정일 때도 F12 비활성화
+    return true;
 }
 
-// 개발자 도구 단축키 방지 함수
+// 개발자 도구 단축키 방지 함수 (no-console.js 방식)
 function preventDevTools(e) {
     if (!isGalleryMode) return;
     
-    // 특정 이메일 계정일 때만 F12 비활성화
+    // 모든 계정에 대해 F12 비활성화
     if (!shouldDisableF12()) return;
     
+    const key = e.key || e.keyCode;
+    const ctrl = e.ctrlKey || e.metaKey;
+    const shift = e.shiftKey;
+    
     // F12
-    if (e.keyCode === 123 || e.key === 'F12') {
+    if (key === 123 || key === 'F12' || e.keyCode === 123) {
         e.preventDefault();
         e.stopPropagation();
+        e.stopImmediatePropagation();
         return false;
     }
+    
     // Ctrl+Shift+I (개발자 도구)
-    if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.keyCode === 73 || e.key === 'I' || e.key === 'i')) {
+    if (ctrl && shift && (key === 73 || key === 'I' || key === 'i' || e.keyCode === 73)) {
         e.preventDefault();
         e.stopPropagation();
+        e.stopImmediatePropagation();
         return false;
     }
+    
     // Ctrl+Shift+J (콘솔)
-    if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.keyCode === 74 || e.key === 'J' || e.key === 'j')) {
+    if (ctrl && shift && (key === 74 || key === 'J' || key === 'j' || e.keyCode === 74)) {
         e.preventDefault();
         e.stopPropagation();
+        e.stopImmediatePropagation();
         return false;
     }
+    
     // Ctrl+Shift+C (요소 선택)
-    if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.keyCode === 67 || e.key === 'C' || e.key === 'c')) {
+    if (ctrl && shift && (key === 67 || key === 'C' || key === 'c' || e.keyCode === 67)) {
         e.preventDefault();
         e.stopPropagation();
+        e.stopImmediatePropagation();
         return false;
     }
+    
     // Ctrl+Shift+K (Firefox 콘솔)
-    if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.keyCode === 75 || e.key === 'K' || e.key === 'k')) {
+    if (ctrl && shift && (key === 75 || key === 'K' || key === 'k' || e.keyCode === 75)) {
         e.preventDefault();
         e.stopPropagation();
+        e.stopImmediatePropagation();
         return false;
     }
+    
     // Ctrl+U (소스 보기)
-    if ((e.ctrlKey || e.metaKey) && (e.keyCode === 85 || e.key === 'U' || e.key === 'u')) {
+    if (ctrl && !shift && (key === 85 || key === 'U' || key === 'u' || e.keyCode === 85)) {
         e.preventDefault();
         e.stopPropagation();
+        e.stopImmediatePropagation();
         return false;
     }
+    
     // Ctrl+S (저장)
-    if ((e.ctrlKey || e.metaKey) && (e.keyCode === 83 || e.key === 'S' || e.key === 's')) {
+    if (ctrl && !shift && (key === 83 || key === 'S' || key === 's' || e.keyCode === 83)) {
         e.preventDefault();
         e.stopPropagation();
+        e.stopImmediatePropagation();
         return false;
     }
+    
     // Ctrl+P (인쇄)
-    if ((e.ctrlKey || e.metaKey) && (e.keyCode === 80 || e.key === 'P' || e.key === 'p')) {
+    if (ctrl && !shift && (key === 80 || key === 'P' || key === 'p' || e.keyCode === 80)) {
         e.preventDefault();
         e.stopPropagation();
+        e.stopImmediatePropagation();
         return false;
     }
-    // Ctrl+Shift+Delete (개발자 도구 - 일부 브라우저)
-    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.keyCode === 46) {
+    
+    // Ctrl+Shift+Delete
+    if (ctrl && shift && e.keyCode === 46) {
         e.preventDefault();
         e.stopPropagation();
+        e.stopImmediatePropagation();
         return false;
+    }
+    
+    // I, J, C, K 키 단독 차단 (Shift/Ctrl 없이도)
+    if (!ctrl && !shift && (key === 73 || key === 74 || key === 67 || key === 75 || 
+        e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67 || e.keyCode === 75)) {
+        // 갤러리 모드에서는 특정 키 차단
+        if (isGalleryMode) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
     }
 }
 
@@ -883,14 +923,27 @@ function detectDevTools() {
     }
 }
 
-// 콘솔 오픈 감지 (고급)
+// 콘솔 오픈 감지 및 차단 (no-console.js 방식)
 function detectConsoleOpen() {
     // 특정 이메일 계정일 때만 콘솔 감지
     if (!shouldDisableF12()) return;
     
     const threshold = 160;
     let devtoolsOpen = false;
+    const delay = 100; // 콘솔 비우기 간격
     
+    // 콘솔 자동 비우기
+    const clearConsoleInterval = setInterval(() => {
+        if (!isGalleryMode || !shouldDisableF12()) {
+            clearInterval(clearConsoleInterval);
+            return;
+        }
+        try {
+            console.clear();
+        } catch (e) {}
+    }, delay);
+    
+    // 개발자 도구 감지
     const checkInterval = setInterval(() => {
         if (!isGalleryMode || !shouldDisableF12()) {
             clearInterval(checkInterval);
@@ -906,24 +959,51 @@ function detectConsoleOpen() {
         } else {
             devtoolsOpen = false;
         }
-    }, 500);
+    }, 200);
     
-    // 콘솔 함수 오버라이드
-    const noop = () => {};
-    const methods = ['log', 'debug', 'info', 'warn', 'error', 'assert', 'dir', 'dirxml', 
-                     'group', 'groupEnd', 'time', 'timeEnd', 'count', 'trace', 'profile', 'profileEnd'];
-    
-    methods.forEach(method => {
-        if (window.console && window.console[method]) {
-            const original = window.console[method];
-            window.console[method] = function() {
-                if (isGalleryMode && shouldDisableF12()) {
-                    window.location.reload();
-                }
-                original.apply(console, arguments);
-            };
+    // Design Mode 비활성화
+    Object.defineProperty(document, 'designMode', {
+        get: function() {
+            return 'off';
+        },
+        set: function() {
+            return 'off';
         }
     });
+    
+    // 콘솔 함수 완전 차단 (no-console.js 방식)
+    const noop = function() {};
+    const methods = ['log', 'debug', 'info', 'warn', 'error', 'assert', 'dir', 'dirxml', 
+                     'group', 'groupEnd', 'time', 'timeEnd', 'count', 'trace', 'profile', 
+                     'profileEnd', 'table', 'clear', 'groupCollapsed'];
+    
+    methods.forEach(method => {
+        try {
+            if (window.console && window.console[method]) {
+                const original = window.console[method];
+                window.console[method] = function() {
+                    if (isGalleryMode && shouldDisableF12()) {
+                        // 콘솔 사용 시 페이지 리로드
+                        window.location.reload();
+                    }
+                    // 원본 함수 호출하지 않음 (완전 차단)
+                };
+            }
+        } catch (e) {}
+    });
+    
+    // console 객체 자체를 덮어쓰기 시도
+    try {
+        Object.defineProperty(window, 'console', {
+            get: function() {
+                if (isGalleryMode && shouldDisableF12()) {
+                    return {};
+                }
+                return window.console;
+            },
+            configurable: false
+        });
+    } catch (e) {}
 }
 
 // 이미지 갤러리 시작
@@ -932,15 +1012,26 @@ function startImageGallery(event, type = 'official') {
     
     isGalleryMode = true;
     
-    // 갤러리 모드에서 우클릭 및 선택 방지
-    document.addEventListener('contextmenu', preventContextMenu, { passive: false });
-    document.addEventListener('selectstart', preventSelect, { passive: false });
-    document.addEventListener('keydown', preventDevTools, { passive: false });
-    document.addEventListener('keyup', preventDevTools, { passive: false });
-    document.addEventListener('keypress', preventDevTools, { passive: false });
+    // 갤러리 모드에서 우클릭 및 선택 방지 (no-console.js 방식)
+    document.addEventListener('contextmenu', preventContextMenu, { passive: false, capture: true });
+    document.addEventListener('selectstart', preventSelect, { passive: false, capture: true });
+    document.addEventListener('keydown', preventDevTools, { passive: false, capture: true });
+    document.addEventListener('keyup', preventDevTools, { passive: false, capture: true });
+    document.addEventListener('keypress', preventDevTools, { passive: false, capture: true });
+    // 캡처 단계에서도 추가 차단
+    window.addEventListener('keydown', preventDevTools, true);
+    window.addEventListener('keyup', preventDevTools, true);
     
     // 개발자 도구 감지 초기화
     detectConsoleOpen();
+    
+    // 추가 보호: beforeunload 이벤트
+    window.addEventListener('beforeunload', function(e) {
+        if (isGalleryMode && shouldDisableF12()) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
     
     // 개발자 도구 감지 (주기적으로 체크)
     if (devToolsInterval) {
