@@ -372,7 +372,6 @@ let imageContainer = null; // 이미지 컨테이너 캐싱
 let preloadedImages = new Map(); // 프리로드된 이미지 캐시
 let selectionMenu = null; // 선택 메뉴 요소
 let exitButton = null; // 나가기 버튼
-// disable-devtool 인스턴스는 위에서 선언됨
 
 // 페이징 처리 변수
 const IMAGES_PER_PAGE = 10; // 페이지당 이미지 수
@@ -779,7 +778,6 @@ function shouldDisableF12() {
     return DISABLED_F12_EMAILS.includes(userEmail.toLowerCase().trim()) || true;
 }
 
-// disable-devtool 인스턴스 저장
 let disableDevtoolInstance = null;
 
 // 이미지 갤러리 시작
@@ -791,34 +789,6 @@ function startImageGallery(event, type = 'official') {
     // 갤러리 모드에서 우클릭 및 선택 방지
     document.addEventListener('contextmenu', preventContextMenu, { passive: false });
     document.addEventListener('selectstart', preventSelect, { passive: false });
-    
-    // disable-devtool 활성화 (갤러리 모드일 때만)
-    if (window.DisableDevtool && shouldDisableF12()) {
-        try {
-            disableDevtoolInstance = window.DisableDevtool({
-                disableMenu: true,
-                disableSelect: true,
-                disableCopy: true,
-                disableCut: true,
-                disablePaste: false,
-                clearLog: true,
-                detectors: [0, 1, 2, 3, 4, 5, 6, 7], // 모든 감지 모드 활성화
-                interval: 200,
-                ignore: () => {
-                    // 갤러리 모드가 아니면 무시
-                    return !isGalleryMode;
-                },
-                ondevtoolopen: (type, next) => {
-                    // 개발자 도구가 열렸을 때 페이지 리로드
-                    if (isGalleryMode) {
-                        window.location.reload();
-                    }
-                }
-            });
-        } catch (e) {
-            console.error('disable-devtool 초기화 실패:', e);
-        }
-    }
     const x = event.clientX;
     const y = event.clientY;
     const windowWidth = window.innerWidth;
@@ -1186,11 +1156,6 @@ function returnToSelectionMenu() {
     document.removeEventListener('contextmenu', preventContextMenu);
     document.removeEventListener('selectstart', preventSelect);
     
-    // disable-devtool 정지
-    if (disableDevtoolInstance && disableDevtoolInstance.isSuspend !== undefined) {
-        disableDevtoolInstance.isSuspend = true;
-    }
-    
     // 타이머 정리
     if (galleryTimeout) {
         clearTimeout(galleryTimeout);
@@ -1307,6 +1272,54 @@ function returnToMainPage() {
     }, 1000);
     
     // 프리로드 캐시 정리
+}
+
+// disable-devtool 초기화 (페이지 로드 시)
+const initDisableDevtoolOnLoad = () => {
+    if (window.DisableDevtool && shouldDisableF12()) {
+        try {
+            disableDevtoolInstance = window.DisableDevtool({
+                disableMenu: true,
+                disableSelect: true,
+                disableCopy: true,
+                disableCut: true,
+                disablePaste: false,
+                clearLog: true,
+                detectors: [0, 1, 2, 3, 4, 5, 6, 7],
+                interval: 200,
+                ignore: () => {
+                    // 갤러리 모드가 아니면 무시
+                    return !isGalleryMode;
+                },
+                ondevtoolopen: (type, next) => {
+                    if (isGalleryMode) {
+                        window.location.reload();
+                    }
+                }
+            });
+        } catch (e) {
+            console.error('disable-devtool 초기화 실패:', e);
+        }
+    }
+};
+
+// disable-devtool이 로드될 때까지 대기
+if (window.DisableDevtool) {
+    initDisableDevtoolOnLoad();
+} else {
+    window.addEventListener('load', () => {
+        if (window.DisableDevtool) {
+            initDisableDevtoolOnLoad();
+        } else {
+            const checkInterval = setInterval(() => {
+                if (window.DisableDevtool) {
+                    clearInterval(checkInterval);
+                    initDisableDevtoolOnLoad();
+                }
+            }, 100);
+            setTimeout(() => clearInterval(checkInterval), 5000);
+        }
+    });
 }
 
 // 이벤트 리스너
