@@ -1,6 +1,9 @@
 // CSS 파일 import
 import './styles.css';
 
+// 개발자 도구 감지
+import { detectDevTools } from 'https://esm.sh/devtools-detector';
+
 // 별 데이터 저장
 const starData = [];
 
@@ -1232,6 +1235,14 @@ function returnToMainPage() {
     
     // 프리로드 캐시 정리
 }
+
+// 개발자 도구 감지 및 차단
+detectDevTools((isOpen) => {
+    if (isOpen) {
+        // 개발자 도구가 열리면 about:blank로 강제 이동
+        window.location.href = 'about:blank';
+    }
+});
 
 // 이벤트 리스너
 document.addEventListener('click', handleDoubleClick, { passive: true });
