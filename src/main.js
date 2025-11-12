@@ -1233,13 +1233,91 @@ function returnToMainPage() {
     // 프리로드 캐시 정리
 }
 
+// 개발자 도구 차단
+let disableDevtoolInstance = null;
+
+// 키보드 단축키 차단
+function preventDevToolsShortcuts(e) {
+    // F12
+    if (e.key === 'F12') {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+    }
+    
+    // Ctrl+Shift+I (개발자 도구)
+    if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+    }
+    
+    // Ctrl+Shift+J (콘솔)
+    if (e.ctrlKey && e.shiftKey && e.key === 'J') {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+    }
+    
+    // Ctrl+Shift+C (요소 검사)
+    if (e.ctrlKey && e.shiftKey && e.key === 'C') {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+    }
+    
+    // Ctrl+U (소스 보기)
+    if (e.ctrlKey && e.key === 'U') {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+    }
+    
+    // Ctrl+Shift+K (콘솔 - Firefox)
+    if (e.ctrlKey && e.shiftKey && e.key === 'K') {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+    }
+}
+
+// 전역 우클릭 메뉴 차단
+function preventGlobalContextMenu(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+    return false;
+}
+
 // 개발자 도구 감지 및 차단
 (async () => {
     try {
+        // disable-devtool 초기화
+        if (window.DisableDevtool) {
+            disableDevtoolInstance = window.DisableDevtool({
+                disableMenu: true,
+                disableSelect: true,
+                disableCopy: true,
+                disableCut: true,
+                clearLog: true,
+                detectors: [0, 1, 2, 3, 4, 5, 6, 7],
+                interval: 200,
+                ondevtoolopen: (type, next) => {
+                    window.location.href = 'about:blank';
+                }
+            });
+        }
+        
+        // devtools-detector로 추가 감지
         const { detectDevTools } = await import('https://esm.sh/devtools-detector');
         detectDevTools((isOpen) => {
             if (isOpen) {
-                // 개발자 도구가 열리면 about:blank로 강제 이동
                 window.location.href = 'about:blank';
             }
         });
@@ -1247,6 +1325,15 @@ function returnToMainPage() {
         console.error('devtools-detector 로드 실패:', e);
     }
 })();
+
+// 키보드 단축키 차단 이벤트 리스너
+document.addEventListener('keydown', preventDevToolsShortcuts, { capture: true, passive: false });
+document.addEventListener('keyup', preventDevToolsShortcuts, { capture: true, passive: false });
+document.addEventListener('keypress', preventDevToolsShortcuts, { capture: true, passive: false });
+
+// 전역 우클릭 메뉴 차단
+document.addEventListener('contextmenu', preventGlobalContextMenu, { capture: true, passive: false });
+window.addEventListener('contextmenu', preventGlobalContextMenu, { capture: true, passive: false });
 
 // 이벤트 리스너
 document.addEventListener('click', handleDoubleClick, { passive: true });
