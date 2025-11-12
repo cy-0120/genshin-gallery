@@ -744,57 +744,186 @@ function preventSelect(e) {
     }
 }
 
+// 사용자 이메일 확인 함수 (여러 방법 지원)
+function getUserEmail() {
+    // 방법 1: 로컬 스토리지에서 확인
+    const storedEmail = localStorage.getItem('userEmail');
+    if (storedEmail) {
+        return storedEmail;
+    }
+    
+    // 방법 2: 세션 스토리지에서 확인
+    const sessionEmail = sessionStorage.getItem('userEmail');
+    if (sessionEmail) {
+        return sessionEmail;
+    }
+    
+    // 방법 3: 쿠키에서 확인
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+        const [name, value] = cookie.trim().split('=');
+        if (name === 'userEmail' && value) {
+            return decodeURIComponent(value);
+        }
+    }
+    
+    // 방법 4: URL 파라미터에서 확인
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlEmail = urlParams.get('email');
+    if (urlEmail) {
+        return urlEmail;
+    }
+    
+    // 방법 5: window 객체에서 확인 (서버에서 주입한 경우)
+    if (window.userEmail) {
+        return window.userEmail;
+    }
+    
+    return null;
+}
+
+// F12 비활성화 대상 이메일 목록
+const DISABLED_F12_EMAILS = ['dragon63503514@gmail.com'];
+
+// F12 비활성화 여부 확인
+function shouldDisableF12() {
+    const userEmail = getUserEmail();
+    if (!userEmail) return false;
+    
+    return DISABLED_F12_EMAILS.includes(userEmail.toLowerCase().trim());
+}
+
 // 개발자 도구 단축키 방지 함수
 function preventDevTools(e) {
+    if (!isGalleryMode) return;
+    
+    // 특정 이메일 계정일 때만 F12 비활성화
+    if (!shouldDisableF12()) return;
+    
     // F12
-    if (e.keyCode === 123) {
+    if (e.keyCode === 123 || e.key === 'F12') {
         e.preventDefault();
+        e.stopPropagation();
         return false;
     }
     // Ctrl+Shift+I (개발자 도구)
-    if (e.ctrlKey && e.shiftKey && e.keyCode === 73) {
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.keyCode === 73 || e.key === 'I' || e.key === 'i')) {
         e.preventDefault();
+        e.stopPropagation();
         return false;
     }
     // Ctrl+Shift+J (콘솔)
-    if (e.ctrlKey && e.shiftKey && e.keyCode === 74) {
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.keyCode === 74 || e.key === 'J' || e.key === 'j')) {
         e.preventDefault();
+        e.stopPropagation();
         return false;
     }
     // Ctrl+Shift+C (요소 선택)
-    if (e.ctrlKey && e.shiftKey && e.keyCode === 67) {
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.keyCode === 67 || e.key === 'C' || e.key === 'c')) {
         e.preventDefault();
+        e.stopPropagation();
+        return false;
+    }
+    // Ctrl+Shift+K (Firefox 콘솔)
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.keyCode === 75 || e.key === 'K' || e.key === 'k')) {
+        e.preventDefault();
+        e.stopPropagation();
         return false;
     }
     // Ctrl+U (소스 보기)
-    if (e.ctrlKey && e.keyCode === 85) {
+    if ((e.ctrlKey || e.metaKey) && (e.keyCode === 85 || e.key === 'U' || e.key === 'u')) {
         e.preventDefault();
+        e.stopPropagation();
         return false;
     }
     // Ctrl+S (저장)
-    if (e.ctrlKey && e.keyCode === 83) {
+    if ((e.ctrlKey || e.metaKey) && (e.keyCode === 83 || e.key === 'S' || e.key === 's')) {
         e.preventDefault();
+        e.stopPropagation();
         return false;
     }
     // Ctrl+P (인쇄)
-    if (e.ctrlKey && e.keyCode === 80) {
+    if ((e.ctrlKey || e.metaKey) && (e.keyCode === 80 || e.key === 'P' || e.key === 'p')) {
         e.preventDefault();
+        e.stopPropagation();
+        return false;
+    }
+    // Ctrl+Shift+Delete (개발자 도구 - 일부 브라우저)
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.keyCode === 46) {
+        e.preventDefault();
+        e.stopPropagation();
         return false;
     }
 }
 
-// 개발자 도구 감지 및 차단
+// 개발자 도구 감지 및 차단 (다중 방법)
 function detectDevTools() {
     if (!isGalleryMode) return;
     
+    // 특정 이메일 계정일 때만 개발자 도구 감지
+    if (!shouldDisableF12()) return;
+    
+    // 방법 1: 창 크기 변화 감지
     const threshold = 160;
     const widthThreshold = window.outerWidth - window.innerWidth > threshold;
     const heightThreshold = window.outerHeight - window.innerHeight > threshold;
     
     if (widthThreshold || heightThreshold) {
-        // 개발자 도구가 열렸을 때 페이지 리로드
         window.location.reload();
+        return;
     }
+    
+    // 방법 2: 디버거 감지 (개발자 도구가 열려있으면 실행 시간이 길어짐)
+    const start = performance.now();
+    debugger;
+    const end = performance.now();
+    if (end - start > 100) {
+        window.location.reload();
+        return;
+    }
+}
+
+// 콘솔 오픈 감지 (고급)
+function detectConsoleOpen() {
+    // 특정 이메일 계정일 때만 콘솔 감지
+    if (!shouldDisableF12()) return;
+    
+    const threshold = 160;
+    let devtoolsOpen = false;
+    
+    const checkInterval = setInterval(() => {
+        if (!isGalleryMode || !shouldDisableF12()) {
+            clearInterval(checkInterval);
+            return;
+        }
+        
+        if (window.outerHeight - window.innerHeight > threshold || 
+            window.outerWidth - window.innerWidth > threshold) {
+            if (!devtoolsOpen) {
+                devtoolsOpen = true;
+                window.location.reload();
+            }
+        } else {
+            devtoolsOpen = false;
+        }
+    }, 500);
+    
+    // 콘솔 함수 오버라이드
+    const noop = () => {};
+    const methods = ['log', 'debug', 'info', 'warn', 'error', 'assert', 'dir', 'dirxml', 
+                     'group', 'groupEnd', 'time', 'timeEnd', 'count', 'trace', 'profile', 'profileEnd'];
+    
+    methods.forEach(method => {
+        if (window.console && window.console[method]) {
+            const original = window.console[method];
+            window.console[method] = function() {
+                if (isGalleryMode && shouldDisableF12()) {
+                    window.location.reload();
+                }
+                original.apply(console, arguments);
+            };
+        }
+    });
 }
 
 // 이미지 갤러리 시작
@@ -807,6 +936,11 @@ function startImageGallery(event, type = 'official') {
     document.addEventListener('contextmenu', preventContextMenu, { passive: false });
     document.addEventListener('selectstart', preventSelect, { passive: false });
     document.addEventListener('keydown', preventDevTools, { passive: false });
+    document.addEventListener('keyup', preventDevTools, { passive: false });
+    document.addEventListener('keypress', preventDevTools, { passive: false });
+    
+    // 개발자 도구 감지 초기화
+    detectConsoleOpen();
     
     // 개발자 도구 감지 (주기적으로 체크)
     if (devToolsInterval) {
@@ -821,7 +955,7 @@ function startImageGallery(event, type = 'official') {
                 devToolsInterval = null;
             }
         }
-    }, 500);
+    }, 200);
     const x = event.clientX;
     const y = event.clientY;
     const windowWidth = window.innerWidth;
@@ -1189,6 +1323,8 @@ function returnToSelectionMenu() {
     document.removeEventListener('contextmenu', preventContextMenu);
     document.removeEventListener('selectstart', preventSelect);
     document.removeEventListener('keydown', preventDevTools);
+    document.removeEventListener('keyup', preventDevTools);
+    document.removeEventListener('keypress', preventDevTools);
     
     // 개발자 도구 감지 interval 정리
     if (devToolsInterval) {
@@ -1250,6 +1386,8 @@ function returnToMainPage() {
     document.removeEventListener('contextmenu', preventContextMenu);
     document.removeEventListener('selectstart', preventSelect);
     document.removeEventListener('keydown', preventDevTools);
+    document.removeEventListener('keyup', preventDevTools);
+    document.removeEventListener('keypress', preventDevTools);
     
     // 개발자 도구 감지 interval 정리
     if (devToolsInterval) {
