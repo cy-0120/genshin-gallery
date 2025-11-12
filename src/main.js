@@ -372,6 +372,12 @@ let imageContainer = null; // 이미지 컨테이너 캐싱
 let preloadedImages = new Map(); // 프리로드된 이미지 캐시
 let selectionMenu = null; // 선택 메뉴 요소
 let exitButton = null; // 나가기 버튼
+let devToolsInterval = null; // 개발자 도구 감지 interval
+
+// 페이징 처리 변수
+const IMAGES_PER_PAGE = 10; // 페이지당 이미지 수
+let currentPage = 0; // 현재 페이지
+let preloadedPageCount = 0; // 프리로드된 페이지 수
 
 // 이미지 작가 정보 매핑
 const imageArtistMap = {
@@ -687,11 +693,135 @@ function preloadImage(src) {
     });
 }
 
+// 페이지 단위 이미지 프리로드
+function preloadPageImages(pageIndex) {
+    const startIndex = pageIndex * IMAGES_PER_PAGE;
+    const endIndex = Math.min(startIndex + IMAGES_PER_PAGE, imageList.length);
+    
+    if (startIndex >= imageList.length) return;
+    
+    // 현재 페이지와 다음 페이지까지 프리로드
+    for (let i = startIndex; i < endIndex; i++) {
+        const imgObj = imageList[i];
+        if (!preloadedImages.has(imgObj.path)) {
+            preloadImage(imgObj.path).catch(() => {
+                // 이미지 로드 실패 시 무시
+            });
+        }
+    }
+    
+    preloadedPageCount = Math.max(preloadedPageCount, pageIndex + 1);
+    
+    // 다음 페이지도 미리 프리로드
+    if (endIndex < imageList.length && pageIndex + 1 <= preloadedPageCount) {
+        const nextPageStart = (pageIndex + 1) * IMAGES_PER_PAGE;
+        if (nextPageStart < imageList.length) {
+            for (let i = nextPageStart; i < Math.min(nextPageStart + IMAGES_PER_PAGE, imageList.length); i++) {
+                const imgObj = imageList[i];
+                if (!preloadedImages.has(imgObj.path)) {
+                    preloadImage(imgObj.path).catch(() => {
+                        // 이미지 로드 실패 시 무시
+                    });
+                }
+            }
+        }
+    }
+}
+
+// 우클릭 방지 함수
+function preventContextMenu(e) {
+    if (isGalleryMode) {
+        e.preventDefault();
+        return false;
+    }
+}
+
+// 선택 방지 함수
+function preventSelect(e) {
+    if (isGalleryMode) {
+        e.preventDefault();
+        return false;
+    }
+}
+
+// 개발자 도구 단축키 방지 함수
+function preventDevTools(e) {
+    // F12
+    if (e.keyCode === 123) {
+        e.preventDefault();
+        return false;
+    }
+    // Ctrl+Shift+I (개발자 도구)
+    if (e.ctrlKey && e.shiftKey && e.keyCode === 73) {
+        e.preventDefault();
+        return false;
+    }
+    // Ctrl+Shift+J (콘솔)
+    if (e.ctrlKey && e.shiftKey && e.keyCode === 74) {
+        e.preventDefault();
+        return false;
+    }
+    // Ctrl+Shift+C (요소 선택)
+    if (e.ctrlKey && e.shiftKey && e.keyCode === 67) {
+        e.preventDefault();
+        return false;
+    }
+    // Ctrl+U (소스 보기)
+    if (e.ctrlKey && e.keyCode === 85) {
+        e.preventDefault();
+        return false;
+    }
+    // Ctrl+S (저장)
+    if (e.ctrlKey && e.keyCode === 83) {
+        e.preventDefault();
+        return false;
+    }
+    // Ctrl+P (인쇄)
+    if (e.ctrlKey && e.keyCode === 80) {
+        e.preventDefault();
+        return false;
+    }
+}
+
+// 개발자 도구 감지 및 차단
+function detectDevTools() {
+    if (!isGalleryMode) return;
+    
+    const threshold = 160;
+    const widthThreshold = window.outerWidth - window.innerWidth > threshold;
+    const heightThreshold = window.outerHeight - window.innerHeight > threshold;
+    
+    if (widthThreshold || heightThreshold) {
+        // 개발자 도구가 열렸을 때 페이지 리로드
+        window.location.reload();
+    }
+}
+
 // 이미지 갤러리 시작
 function startImageGallery(event, type = 'official') {
     if (isGalleryMode) return; // 이미 갤러리 모드면 무시
     
     isGalleryMode = true;
+    
+    // 갤러리 모드에서 우클릭 및 선택 방지
+    document.addEventListener('contextmenu', preventContextMenu, { passive: false });
+    document.addEventListener('selectstart', preventSelect, { passive: false });
+    document.addEventListener('keydown', preventDevTools, { passive: false });
+    
+    // 개발자 도구 감지 (주기적으로 체크)
+    if (devToolsInterval) {
+        clearInterval(devToolsInterval);
+    }
+    devToolsInterval = setInterval(() => {
+        if (isGalleryMode) {
+            detectDevTools();
+        } else {
+            if (devToolsInterval) {
+                clearInterval(devToolsInterval);
+                devToolsInterval = null;
+            }
+        }
+    }, 500);
     const x = event.clientX;
     const y = event.clientY;
     const windowWidth = window.innerWidth;
@@ -749,14 +879,12 @@ function startImageGallery(event, type = 'official') {
     // 사용된 이미지 초기화
     usedImages = [];
     
-    // 이미지 프리로드 시작
-    if (imageList.length > 0) {
-        imageList.forEach(imgObj => {
-            preloadImage(imgObj.path).catch(() => {
-                // 이미지 로드 실패 시 무시
-            });
-        });
-    }
+    // 페이징 초기화
+    currentPage = 0;
+    preloadedPageCount = 0;
+    
+    // 첫 페이지 이미지 프리로드
+    preloadPageImages(0);
     
     // 첫 번째 이미지 표시
     requestAnimationFrame(() => {
@@ -798,6 +926,14 @@ function showNextImage() {
     // 사용된 이미지 목록에 추가
     usedImages.push(selectedImageObj);
     currentImageIndex = usedImages.length - 1;
+    
+    // 현재 페이지 계산 및 다음 페이지 프리로드
+    const newPage = Math.floor(usedImages.length / IMAGES_PER_PAGE);
+    if (newPage > currentPage) {
+        currentPage = newPage;
+        // 다음 페이지 프리로드
+        preloadPageImages(currentPage + 1);
+    }
     
     // 이미지 컨테이너 생성 또는 업데이트
     if (!imageContainer) {
@@ -857,6 +993,21 @@ function displayImage(src, imgElement) {
     }
     img.className = 'gallery-image';
     img.alt = 'Gallery Image';
+    
+    // 이미지 다운로드 방지
+    img.draggable = false;
+    img.addEventListener('dragstart', (e) => {
+        e.preventDefault();
+        return false;
+    });
+    img.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        return false;
+    });
+    img.addEventListener('selectstart', (e) => {
+        e.preventDefault();
+        return false;
+    });
     
     // 새 이미지 추가 타이밍 조정
     const addNewImage = () => {
@@ -1034,6 +1185,17 @@ function returnToSelectionMenu() {
     // 갤러리 모드 해제
     isGalleryMode = false;
     
+    // 이벤트 리스너 제거
+    document.removeEventListener('contextmenu', preventContextMenu);
+    document.removeEventListener('selectstart', preventSelect);
+    document.removeEventListener('keydown', preventDevTools);
+    
+    // 개발자 도구 감지 interval 정리
+    if (devToolsInterval) {
+        clearInterval(devToolsInterval);
+        devToolsInterval = null;
+    }
+    
     // 타이머 정리
     if (galleryTimeout) {
         clearTimeout(galleryTimeout);
@@ -1083,6 +1245,17 @@ function returnToMainPage() {
     
     isGalleryMode = false;
     isMenuMode = false; // 메뉴 모드도 해제
+    
+    // 이벤트 리스너 제거
+    document.removeEventListener('contextmenu', preventContextMenu);
+    document.removeEventListener('selectstart', preventSelect);
+    document.removeEventListener('keydown', preventDevTools);
+    
+    // 개발자 도구 감지 interval 정리
+    if (devToolsInterval) {
+        clearInterval(devToolsInterval);
+        devToolsInterval = null;
+    }
     
     // 타이머 정리
     if (galleryTimeout) {

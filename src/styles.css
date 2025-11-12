@@ -710,6 +710,17 @@ body.gallery-exit::before {
     /* 이미지 렌더링 */
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
+    /* 이미지 다운로드 방지 */
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    pointer-events: none;
+    -webkit-touch-callout: none;
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
 }
 
 .gallery-image.fade-in {
