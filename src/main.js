@@ -177,6 +177,9 @@ function createRipple(event) {
     // 애니메이션 중이면 무시
     if (isAnimating) return;
     
+    // 효과음 재생
+    playClickSound();
+    
     isAnimating = true;
     
     const ripple = document.createElement('div');
@@ -524,6 +527,38 @@ function initializeFanWorkImages() {
 function initializeImageList() {
     initializeOfficialImages();
     initializeFanWorkImages();
+}
+
+// 효과음 재생
+let clickSound = null;
+let soundEnabled = true;
+
+function initClickSound() {
+    try {
+        clickSound = new Audio();
+        clickSound.src = 'https://assets.mixkit.co/sfx/preview/mixkit-magic-spell-667.mp3';
+        clickSound.volume = 0.3;
+        clickSound.preload = 'auto';
+        clickSound.onerror = () => {
+            soundEnabled = false;
+        };
+    } catch (e) {
+        soundEnabled = false;
+    }
+}
+
+function playClickSound() {
+    if (!soundEnabled || !clickSound) return;
+    
+    try {
+        const sound = clickSound.cloneNode();
+        sound.volume = 0.3;
+        sound.play().catch(() => {
+            soundEnabled = false;
+        });
+    } catch (e) {
+        soundEnabled = false;
+    }
 }
 
 // 더블 클릭 감지
@@ -1465,6 +1500,9 @@ function preventGlobalContextMenu(e) {
 
 // 이벤트 리스너
 document.addEventListener('click', handleDoubleClick, { passive: true });
+
+// 효과음 초기화
+initClickSound();
 
 // 별 생성 초기화
 createStars();
