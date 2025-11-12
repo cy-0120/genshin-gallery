@@ -372,7 +372,7 @@ let imageContainer = null; // 이미지 컨테이너 캐싱
 let preloadedImages = new Map(); // 프리로드된 이미지 캐시
 let selectionMenu = null; // 선택 메뉴 요소
 let exitButton = null; // 나가기 버튼
-let devToolsInterval = null; // 개발자 도구 감지 interval
+// disable-devtool 인스턴스는 위에서 선언됨
 
 // 페이징 처리 변수
 const IMAGES_PER_PAGE = 10; // 페이지당 이미지 수
@@ -744,21 +744,14 @@ function preventSelect(e) {
     }
 }
 
-// 사용자 이메일 확인 함수 (여러 방법 지원)
+// 사용자 이메일 확인 함수
 function getUserEmail() {
-    // 방법 1: 로컬 스토리지에서 확인
     const storedEmail = localStorage.getItem('userEmail');
-    if (storedEmail) {
-        return storedEmail;
-    }
+    if (storedEmail) return storedEmail;
     
-    // 방법 2: 세션 스토리지에서 확인
     const sessionEmail = sessionStorage.getItem('userEmail');
-    if (sessionEmail) {
-        return sessionEmail;
-    }
+    if (sessionEmail) return sessionEmail;
     
-    // 방법 3: 쿠키에서 확인
     const cookies = document.cookie.split(';');
     for (let cookie of cookies) {
         const [name, value] = cookie.trim().split('=');
@@ -767,17 +760,11 @@ function getUserEmail() {
         }
     }
     
-    // 방법 4: URL 파라미터에서 확인
     const urlParams = new URLSearchParams(window.location.search);
     const urlEmail = urlParams.get('email');
-    if (urlEmail) {
-        return urlEmail;
-    }
+    if (urlEmail) return urlEmail;
     
-    // 방법 5: window 객체에서 확인 (서버에서 주입한 경우)
-    if (window.userEmail) {
-        return window.userEmail;
-    }
+    if (window.userEmail) return window.userEmail;
     
     return null;
 }
@@ -788,223 +775,12 @@ const DISABLED_F12_EMAILS = ['dragon63503514@gmail.com'];
 // F12 비활성화 여부 확인
 function shouldDisableF12() {
     const userEmail = getUserEmail();
-    
-    // 이메일이 없으면 기본적으로 F12 비활성화 (모든 사용자)
     if (!userEmail) return true;
-    
-    // 특정 이메일 목록에 있으면 F12 비활성화
-    if (DISABLED_F12_EMAILS.includes(userEmail.toLowerCase().trim())) {
-        return true;
-    }
-    
-    // 다른 계정일 때도 F12 비활성화
-    return true;
+    return DISABLED_F12_EMAILS.includes(userEmail.toLowerCase().trim()) || true;
 }
 
-// 개발자 도구 단축키 방지 함수 (no-console.js 방식)
-function preventDevTools(e) {
-    if (!isGalleryMode) return;
-    
-    // 모든 계정에 대해 F12 비활성화
-    if (!shouldDisableF12()) return;
-    
-    const key = e.key || e.keyCode;
-    const ctrl = e.ctrlKey || e.metaKey;
-    const shift = e.shiftKey;
-    
-    // F12
-    if (key === 123 || key === 'F12' || e.keyCode === 123) {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-        return false;
-    }
-    
-    // Ctrl+Shift+I (개발자 도구)
-    if (ctrl && shift && (key === 73 || key === 'I' || key === 'i' || e.keyCode === 73)) {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-        return false;
-    }
-    
-    // Ctrl+Shift+J (콘솔)
-    if (ctrl && shift && (key === 74 || key === 'J' || key === 'j' || e.keyCode === 74)) {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-        return false;
-    }
-    
-    // Ctrl+Shift+C (요소 선택)
-    if (ctrl && shift && (key === 67 || key === 'C' || key === 'c' || e.keyCode === 67)) {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-        return false;
-    }
-    
-    // Ctrl+Shift+K (Firefox 콘솔)
-    if (ctrl && shift && (key === 75 || key === 'K' || key === 'k' || e.keyCode === 75)) {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-        return false;
-    }
-    
-    // Ctrl+U (소스 보기)
-    if (ctrl && !shift && (key === 85 || key === 'U' || key === 'u' || e.keyCode === 85)) {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-        return false;
-    }
-    
-    // Ctrl+S (저장)
-    if (ctrl && !shift && (key === 83 || key === 'S' || key === 's' || e.keyCode === 83)) {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-        return false;
-    }
-    
-    // Ctrl+P (인쇄)
-    if (ctrl && !shift && (key === 80 || key === 'P' || key === 'p' || e.keyCode === 80)) {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-        return false;
-    }
-    
-    // Ctrl+Shift+Delete
-    if (ctrl && shift && e.keyCode === 46) {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-        return false;
-    }
-    
-    // I, J, C, K 키 단독 차단 (Shift/Ctrl 없이도)
-    if (!ctrl && !shift && (key === 73 || key === 74 || key === 67 || key === 75 || 
-        e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67 || e.keyCode === 75)) {
-        // 갤러리 모드에서는 특정 키 차단
-        if (isGalleryMode) {
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        }
-    }
-}
-
-// 개발자 도구 감지 및 차단 (다중 방법)
-function detectDevTools() {
-    if (!isGalleryMode) return;
-    
-    // 특정 이메일 계정일 때만 개발자 도구 감지
-    if (!shouldDisableF12()) return;
-    
-    // 방법 1: 창 크기 변화 감지
-    const threshold = 160;
-    const widthThreshold = window.outerWidth - window.innerWidth > threshold;
-    const heightThreshold = window.outerHeight - window.innerHeight > threshold;
-    
-    if (widthThreshold || heightThreshold) {
-        window.location.reload();
-        return;
-    }
-    
-    // 방법 2: 디버거 감지 (개발자 도구가 열려있으면 실행 시간이 길어짐)
-    const start = performance.now();
-    debugger;
-    const end = performance.now();
-    if (end - start > 100) {
-        window.location.reload();
-        return;
-    }
-}
-
-// 콘솔 오픈 감지 및 차단 (no-console.js 방식)
-function detectConsoleOpen() {
-    // 특정 이메일 계정일 때만 콘솔 감지
-    if (!shouldDisableF12()) return;
-    
-    const threshold = 160;
-    let devtoolsOpen = false;
-    const delay = 100; // 콘솔 비우기 간격
-    
-    // 콘솔 자동 비우기
-    const clearConsoleInterval = setInterval(() => {
-        if (!isGalleryMode || !shouldDisableF12()) {
-            clearInterval(clearConsoleInterval);
-            return;
-        }
-        try {
-            console.clear();
-        } catch (e) {}
-    }, delay);
-    
-    // 개발자 도구 감지
-    const checkInterval = setInterval(() => {
-        if (!isGalleryMode || !shouldDisableF12()) {
-            clearInterval(checkInterval);
-            return;
-        }
-        
-        if (window.outerHeight - window.innerHeight > threshold || 
-            window.outerWidth - window.innerWidth > threshold) {
-            if (!devtoolsOpen) {
-                devtoolsOpen = true;
-                window.location.reload();
-            }
-        } else {
-            devtoolsOpen = false;
-        }
-    }, 200);
-    
-    // Design Mode 비활성화
-    Object.defineProperty(document, 'designMode', {
-        get: function() {
-            return 'off';
-        },
-        set: function() {
-            return 'off';
-        }
-    });
-    
-    // 콘솔 함수 완전 차단 (no-console.js 방식)
-    const noop = function() {};
-    const methods = ['log', 'debug', 'info', 'warn', 'error', 'assert', 'dir', 'dirxml', 
-                     'group', 'groupEnd', 'time', 'timeEnd', 'count', 'trace', 'profile', 
-                     'profileEnd', 'table', 'clear', 'groupCollapsed'];
-    
-    methods.forEach(method => {
-        try {
-            if (window.console && window.console[method]) {
-                const original = window.console[method];
-                window.console[method] = function() {
-                    if (isGalleryMode && shouldDisableF12()) {
-                        // 콘솔 사용 시 페이지 리로드
-                        window.location.reload();
-                    }
-                    // 원본 함수 호출하지 않음 (완전 차단)
-                };
-            }
-        } catch (e) {}
-    });
-    
-    // console 객체 자체를 덮어쓰기 시도
-    try {
-        Object.defineProperty(window, 'console', {
-            get: function() {
-                if (isGalleryMode && shouldDisableF12()) {
-                    return {};
-                }
-                return window.console;
-            },
-            configurable: false
-        });
-    } catch (e) {}
-}
+// disable-devtool 인스턴스 저장
+let disableDevtoolInstance = null;
 
 // 이미지 갤러리 시작
 function startImageGallery(event, type = 'official') {
@@ -1012,41 +788,37 @@ function startImageGallery(event, type = 'official') {
     
     isGalleryMode = true;
     
-    // 갤러리 모드에서 우클릭 및 선택 방지 (no-console.js 방식)
-    document.addEventListener('contextmenu', preventContextMenu, { passive: false, capture: true });
-    document.addEventListener('selectstart', preventSelect, { passive: false, capture: true });
-    document.addEventListener('keydown', preventDevTools, { passive: false, capture: true });
-    document.addEventListener('keyup', preventDevTools, { passive: false, capture: true });
-    document.addEventListener('keypress', preventDevTools, { passive: false, capture: true });
-    // 캡처 단계에서도 추가 차단
-    window.addEventListener('keydown', preventDevTools, true);
-    window.addEventListener('keyup', preventDevTools, true);
+    // 갤러리 모드에서 우클릭 및 선택 방지
+    document.addEventListener('contextmenu', preventContextMenu, { passive: false });
+    document.addEventListener('selectstart', preventSelect, { passive: false });
     
-    // 개발자 도구 감지 초기화
-    detectConsoleOpen();
-    
-    // 추가 보호: beforeunload 이벤트
-    window.addEventListener('beforeunload', function(e) {
-        if (isGalleryMode && shouldDisableF12()) {
-            e.preventDefault();
-            e.returnValue = '';
+    // disable-devtool 활성화 (갤러리 모드일 때만)
+    if (window.DisableDevtool && shouldDisableF12()) {
+        try {
+            disableDevtoolInstance = window.DisableDevtool({
+                disableMenu: true,
+                disableSelect: true,
+                disableCopy: true,
+                disableCut: true,
+                disablePaste: false,
+                clearLog: true,
+                detectors: [0, 1, 2, 3, 4, 5, 6, 7], // 모든 감지 모드 활성화
+                interval: 200,
+                ignore: () => {
+                    // 갤러리 모드가 아니면 무시
+                    return !isGalleryMode;
+                },
+                ondevtoolopen: (type, next) => {
+                    // 개발자 도구가 열렸을 때 페이지 리로드
+                    if (isGalleryMode) {
+                        window.location.reload();
+                    }
+                }
+            });
+        } catch (e) {
+            console.error('disable-devtool 초기화 실패:', e);
         }
-    });
-    
-    // 개발자 도구 감지 (주기적으로 체크)
-    if (devToolsInterval) {
-        clearInterval(devToolsInterval);
     }
-    devToolsInterval = setInterval(() => {
-        if (isGalleryMode) {
-            detectDevTools();
-        } else {
-            if (devToolsInterval) {
-                clearInterval(devToolsInterval);
-                devToolsInterval = null;
-            }
-        }
-    }, 200);
     const x = event.clientX;
     const y = event.clientY;
     const windowWidth = window.innerWidth;
@@ -1413,14 +1185,10 @@ function returnToSelectionMenu() {
     // 이벤트 리스너 제거
     document.removeEventListener('contextmenu', preventContextMenu);
     document.removeEventListener('selectstart', preventSelect);
-    document.removeEventListener('keydown', preventDevTools);
-    document.removeEventListener('keyup', preventDevTools);
-    document.removeEventListener('keypress', preventDevTools);
     
-    // 개발자 도구 감지 interval 정리
-    if (devToolsInterval) {
-        clearInterval(devToolsInterval);
-        devToolsInterval = null;
+    // disable-devtool 정지
+    if (disableDevtoolInstance && disableDevtoolInstance.isSuspend !== undefined) {
+        disableDevtoolInstance.isSuspend = true;
     }
     
     // 타이머 정리
@@ -1476,14 +1244,10 @@ function returnToMainPage() {
     // 이벤트 리스너 제거
     document.removeEventListener('contextmenu', preventContextMenu);
     document.removeEventListener('selectstart', preventSelect);
-    document.removeEventListener('keydown', preventDevTools);
-    document.removeEventListener('keyup', preventDevTools);
-    document.removeEventListener('keypress', preventDevTools);
     
-    // 개발자 도구 감지 interval 정리
-    if (devToolsInterval) {
-        clearInterval(devToolsInterval);
-        devToolsInterval = null;
+    // disable-devtool 정지
+    if (disableDevtoolInstance && disableDevtoolInstance.isSuspend !== undefined) {
+        disableDevtoolInstance.isSuspend = true;
     }
     
     // 타이머 정리
