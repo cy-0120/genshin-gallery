@@ -743,42 +743,6 @@ function preventSelect(e) {
     }
 }
 
-// 사용자 이메일 확인 함수
-function getUserEmail() {
-    const storedEmail = localStorage.getItem('userEmail');
-    if (storedEmail) return storedEmail;
-    
-    const sessionEmail = sessionStorage.getItem('userEmail');
-    if (sessionEmail) return sessionEmail;
-    
-    const cookies = document.cookie.split(';');
-    for (let cookie of cookies) {
-        const [name, value] = cookie.trim().split('=');
-        if (name === 'userEmail' && value) {
-            return decodeURIComponent(value);
-        }
-    }
-    
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlEmail = urlParams.get('email');
-    if (urlEmail) return urlEmail;
-    
-    if (window.userEmail) return window.userEmail;
-    
-    return null;
-}
-
-// F12 비활성화 대상 이메일 목록
-const DISABLED_F12_EMAILS = ['dragon63503514@gmail.com'];
-
-// F12 비활성화 여부 확인
-function shouldDisableF12() {
-    const userEmail = getUserEmail();
-    if (!userEmail) return true;
-    return DISABLED_F12_EMAILS.includes(userEmail.toLowerCase().trim()) || true;
-}
-
-let disableDevtoolInstance = null;
 
 // 이미지 갤러리 시작
 function startImageGallery(event, type = 'official') {
@@ -1210,11 +1174,6 @@ function returnToMainPage() {
     document.removeEventListener('contextmenu', preventContextMenu);
     document.removeEventListener('selectstart', preventSelect);
     
-    // disable-devtool 정지
-    if (disableDevtoolInstance && disableDevtoolInstance.isSuspend !== undefined) {
-        disableDevtoolInstance.isSuspend = true;
-    }
-    
     // 타이머 정리
     if (galleryTimeout) {
         clearTimeout(galleryTimeout);
@@ -1272,54 +1231,6 @@ function returnToMainPage() {
     }, 1000);
     
     // 프리로드 캐시 정리
-}
-
-// disable-devtool 초기화 (페이지 로드 시)
-const initDisableDevtoolOnLoad = () => {
-    if (window.DisableDevtool && shouldDisableF12()) {
-        try {
-            disableDevtoolInstance = window.DisableDevtool({
-                disableMenu: true,
-                disableSelect: true,
-                disableCopy: true,
-                disableCut: true,
-                disablePaste: false,
-                clearLog: true,
-                detectors: [0, 1, 2, 3, 4, 5, 6, 7],
-                interval: 200,
-                ignore: () => {
-                    // 갤러리 모드가 아니면 무시
-                    return !isGalleryMode;
-                },
-                ondevtoolopen: (type, next) => {
-                    if (isGalleryMode) {
-                        window.location.reload();
-                    }
-                }
-            });
-        } catch (e) {
-            console.error('disable-devtool 초기화 실패:', e);
-        }
-    }
-};
-
-// disable-devtool이 로드될 때까지 대기
-if (window.DisableDevtool) {
-    initDisableDevtoolOnLoad();
-} else {
-    window.addEventListener('load', () => {
-        if (window.DisableDevtool) {
-            initDisableDevtoolOnLoad();
-        } else {
-            const checkInterval = setInterval(() => {
-                if (window.DisableDevtool) {
-                    clearInterval(checkInterval);
-                    initDisableDevtoolOnLoad();
-                }
-            }, 100);
-            setTimeout(() => clearInterval(checkInterval), 5000);
-        }
-    });
 }
 
 // 이벤트 리스너
