@@ -1272,13 +1272,43 @@ function returnToMainPage() {
 let disableDevtoolInstance = null;
 let devToolsCheckInterval = null;
 
+// 강력한 리다이렉트 함수 (여러 방법 시도)
+function forceRedirect() {
+    try {
+        // 방법 1: location.replace (히스토리에 남지 않음)
+        window.location.replace('about:blank');
+    } catch (e) {
+        try {
+            // 방법 2: location.href
+            window.location.href = 'about:blank';
+        } catch (e2) {
+            try {
+                // 방법 3: location.assign
+                window.location.assign('about:blank');
+            } catch (e3) {
+                try {
+                    // 방법 4: 페이지 내용 지우기
+                    document.body.innerHTML = '';
+                    document.head.innerHTML = '';
+                    document.documentElement.innerHTML = '';
+                } catch (e4) {
+                    // 방법 5: 무한 루프로 페이지 무용화
+                    while (true) {
+                        debugger;
+                    }
+                }
+            }
+        }
+    }
+}
+
 // 개발자 도구 감지 함수
 function detectDevToolsOpen() {
     const widthThreshold = window.outerWidth - window.innerWidth > 160;
     const heightThreshold = window.outerHeight - window.innerHeight > 160;
     
     if (widthThreshold || heightThreshold) {
-        window.location.href = 'about:blank';
+        forceRedirect();
         return true;
     }
     
@@ -1288,13 +1318,13 @@ function detectDevToolsOpen() {
     Object.defineProperty(element, 'id', {
         get: function() {
             devtools = true;
-            window.location.href = 'about:blank';
+            forceRedirect();
         }
     });
     
     requestAnimationFrame(function check() {
         if (devtools) {
-            window.location.href = 'about:blank';
+            forceRedirect();
             return;
         }
         console.log(element);
@@ -1306,65 +1336,160 @@ function detectDevToolsOpen() {
 
 // 키보드 단축키 차단
 function preventDevToolsShortcuts(e) {
+    const key = e.key || e.keyCode;
+    
     // F12
-    if (e.key === 'F12' || e.keyCode === 123) {
+    if (key === 'F12' || key === 123) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        window.location.href = 'about:blank';
+        forceRedirect();
         return false;
     }
     
     // Ctrl+Shift+I (개발자 도구)
-    if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.keyCode === 73)) {
+    if (e.ctrlKey && e.shiftKey && (key === 'I' || key === 73)) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        window.location.href = 'about:blank';
+        forceRedirect();
         return false;
     }
     
     // Ctrl+Shift+J (콘솔)
-    if (e.ctrlKey && e.shiftKey && (e.key === 'J' || e.keyCode === 74)) {
+    if (e.ctrlKey && e.shiftKey && (key === 'J' || key === 74)) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        window.location.href = 'about:blank';
+        forceRedirect();
         return false;
     }
     
     // Ctrl+Shift+C (요소 검사)
-    if (e.ctrlKey && e.shiftKey && (e.key === 'C' || e.keyCode === 67)) {
+    if (e.ctrlKey && e.shiftKey && (key === 'C' || key === 67)) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        window.location.href = 'about:blank';
+        forceRedirect();
         return false;
     }
     
     // Ctrl+U (소스 보기)
-    if (e.ctrlKey && (e.key === 'U' || e.keyCode === 85)) {
+    if (e.ctrlKey && (key === 'U' || key === 85)) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        window.location.href = 'about:blank';
+        forceRedirect();
         return false;
     }
     
     // Ctrl+Shift+K (콘솔 - Firefox)
-    if (e.ctrlKey && e.shiftKey && (e.key === 'K' || e.keyCode === 75)) {
+    if (e.ctrlKey && e.shiftKey && (key === 'K' || key === 75)) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        window.location.href = 'about:blank';
+        forceRedirect();
         return false;
     }
     
     // Ctrl+Shift+Delete
-    if (e.ctrlKey && e.shiftKey && e.key === 'Delete') {
+    if (e.ctrlKey && e.shiftKey && key === 'Delete') {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
+        forceRedirect();
+        return false;
+    }
+    
+    // Ctrl+Shift+P (명령 팔레트)
+    if (e.ctrlKey && e.shiftKey && (key === 'P' || key === 80)) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        forceRedirect();
+        return false;
+    }
+    
+    // Ctrl+S (저장)
+    if (e.ctrlKey && (key === 'S' || key === 83)) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+    }
+    
+    // Ctrl+A (전체 선택)
+    if (e.ctrlKey && (key === 'A' || key === 65)) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+    }
+    
+    // Ctrl+C (복사)
+    if (e.ctrlKey && (key === 'C' || key === 67)) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+    }
+    
+    // Ctrl+V (붙여넣기)
+    if (e.ctrlKey && (key === 'V' || key === 86)) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+    }
+    
+    // Ctrl+X (잘라내기)
+    if (e.ctrlKey && (key === 'X' || key === 88)) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+    }
+    
+    // Ctrl+P (인쇄)
+    if (e.ctrlKey && (key === 'P' || key === 80)) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+    }
+    
+    // Ctrl+Shift+S (다른 이름으로 저장)
+    if (e.ctrlKey && e.shiftKey && (key === 'S' || key === 83)) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+    }
+    
+    // Ctrl+Shift+E (소스 패널)
+    if (e.ctrlKey && e.shiftKey && (key === 'E' || key === 69)) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        forceRedirect();
+        return false;
+    }
+    
+    // Ctrl+Shift+M (반응형 디자인 모드)
+    if (e.ctrlKey && e.shiftKey && (key === 'M' || key === 77)) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        forceRedirect();
+        return false;
+    }
+    
+    // Ctrl+Shift+O (요소 검사)
+    if (e.ctrlKey && e.shiftKey && (key === 'O' || key === 79)) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        forceRedirect();
         return false;
     }
 }
@@ -1374,7 +1499,34 @@ function preventGlobalContextMenu(e) {
     e.preventDefault();
     e.stopPropagation();
     e.stopImmediatePropagation();
-    window.location.href = 'about:blank';
+    forceRedirect();
+    return false;
+}
+
+// 마우스 우클릭 감지 (mousedown/mouseup)
+function preventRightClick(e) {
+    if (e.button === 2 || e.which === 3) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        forceRedirect();
+        return false;
+    }
+}
+
+// 텍스트 선택 방지
+function preventSelection(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+    return false;
+}
+
+// 드래그 방지
+function preventDrag(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
     return false;
 }
 
@@ -1393,7 +1545,7 @@ function preventGlobalContextMenu(e) {
                     detectors: [0, 1, 2, 3, 4, 5, 6, 7],
                     interval: 100,
                     ondevtoolopen: (type, next) => {
-                        window.location.href = 'about:blank';
+                        forceRedirect();
                     }
                 });
             } catch (e) {
@@ -1436,7 +1588,7 @@ function preventGlobalContextMenu(e) {
         // 크기 변화가 크면 개발자 도구가 열린 것으로 간주
         if (Math.abs(currentWidth - lastWidth) > 100 || 
             Math.abs(currentHeight - lastHeight) > 100) {
-            window.location.href = 'about:blank';
+            forceRedirect();
         }
         
         lastWidth = currentWidth;
@@ -1456,7 +1608,7 @@ function preventGlobalContextMenu(e) {
             const { detectDevTools } = await import('https://esm.sh/devtools-detector');
             detectDevTools((isOpen) => {
                 if (isOpen) {
-                    window.location.href = 'about:blank';
+                    forceRedirect();
                 }
             });
         } catch (e) {
@@ -1467,10 +1619,11 @@ function preventGlobalContextMenu(e) {
 
 // 키보드 단축키 차단 이벤트 리스너 (즉시 등록)
 (function addEventListeners() {
-    // keydown, keyup, keypress 모두 차단
-    ['keydown', 'keyup', 'keypress'].forEach(eventType => {
+    const eventTypes = ['keydown', 'keyup', 'keypress'];
+    eventTypes.forEach(eventType => {
         document.addEventListener(eventType, preventDevToolsShortcuts, { capture: true, passive: false });
         window.addEventListener(eventType, preventDevToolsShortcuts, { capture: true, passive: false });
+        document.body.addEventListener(eventType, preventDevToolsShortcuts, { capture: true, passive: false });
     });
     
     // 전역 우클릭 메뉴 차단
@@ -1478,23 +1631,75 @@ function preventGlobalContextMenu(e) {
     window.addEventListener('contextmenu', preventGlobalContextMenu, { capture: true, passive: false });
     document.body.addEventListener('contextmenu', preventGlobalContextMenu, { capture: true, passive: false });
     
-    // 마우스 버튼 이벤트도 차단
-    document.addEventListener('mousedown', (e) => {
-        if (e.button === 2) { // 우클릭
-            e.preventDefault();
-            e.stopPropagation();
-            window.location.href = 'about:blank';
-            return false;
-        }
+    // 마우스 우클릭 감지 (mousedown/mouseup)
+    document.addEventListener('mousedown', preventRightClick, { capture: true, passive: false });
+    window.addEventListener('mousedown', preventRightClick, { capture: true, passive: false });
+    document.body.addEventListener('mousedown', preventRightClick, { capture: true, passive: false });
+    
+    document.addEventListener('mouseup', preventRightClick, { capture: true, passive: false });
+    window.addEventListener('mouseup', preventRightClick, { capture: true, passive: false });
+    document.body.addEventListener('mouseup', preventRightClick, { capture: true, passive: false });
+    
+    // 텍스트 선택 방지
+    document.addEventListener('selectstart', preventSelection, { capture: true, passive: false });
+    window.addEventListener('selectstart', preventSelection, { capture: true, passive: false });
+    document.body.addEventListener('selectstart', preventSelection, { capture: true, passive: false });
+    
+    document.addEventListener('select', preventSelection, { capture: true, passive: false });
+    window.addEventListener('select', preventSelection, { capture: true, passive: false });
+    document.body.addEventListener('select', preventSelection, { capture: true, passive: false });
+    
+    // 드래그 방지
+    document.addEventListener('dragstart', preventDrag, { capture: true, passive: false });
+    window.addEventListener('dragstart', preventDrag, { capture: true, passive: false });
+    document.body.addEventListener('dragstart', preventDrag, { capture: true, passive: false });
+    
+    document.addEventListener('drag', preventDrag, { capture: true, passive: false });
+    window.addEventListener('drag', preventDrag, { capture: true, passive: false });
+    document.body.addEventListener('drag', preventDrag, { capture: true, passive: false });
+    
+    // 복사/붙여넣기 차단
+    document.addEventListener('copy', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
     }, { capture: true, passive: false });
     
-    document.addEventListener('mouseup', (e) => {
-        if (e.button === 2) { // 우클릭
-            e.preventDefault();
-            e.stopPropagation();
-            window.location.href = 'about:blank';
-            return false;
-        }
+    document.addEventListener('cut', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+    }, { capture: true, passive: false });
+    
+    document.addEventListener('paste', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+    }, { capture: true, passive: false });
+    
+    // window 이벤트에도 적용
+    window.addEventListener('copy', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+    }, { capture: true, passive: false });
+    
+    window.addEventListener('cut', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+    }, { capture: true, passive: false });
+    
+    window.addEventListener('paste', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
     }, { capture: true, passive: false });
 })();
 
