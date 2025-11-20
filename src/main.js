@@ -1343,7 +1343,6 @@ function preventDevToolsShortcuts(e) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        forceRedirect();
         return false;
     }
     
@@ -1352,7 +1351,6 @@ function preventDevToolsShortcuts(e) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        forceRedirect();
         return false;
     }
     
@@ -1361,7 +1359,6 @@ function preventDevToolsShortcuts(e) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        forceRedirect();
         return false;
     }
     
@@ -1370,7 +1367,6 @@ function preventDevToolsShortcuts(e) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        forceRedirect();
         return false;
     }
     
@@ -1379,7 +1375,6 @@ function preventDevToolsShortcuts(e) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        forceRedirect();
         return false;
     }
     
@@ -1388,7 +1383,6 @@ function preventDevToolsShortcuts(e) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        forceRedirect();
         return false;
     }
     
@@ -1397,7 +1391,6 @@ function preventDevToolsShortcuts(e) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        forceRedirect();
         return false;
     }
     
@@ -1406,7 +1399,6 @@ function preventDevToolsShortcuts(e) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        forceRedirect();
         return false;
     }
     
@@ -1471,7 +1463,6 @@ function preventDevToolsShortcuts(e) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        forceRedirect();
         return false;
     }
     
@@ -1480,7 +1471,6 @@ function preventDevToolsShortcuts(e) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        forceRedirect();
         return false;
     }
     
@@ -1489,7 +1479,6 @@ function preventDevToolsShortcuts(e) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        forceRedirect();
         return false;
     }
 }
@@ -1499,7 +1488,6 @@ function preventGlobalContextMenu(e) {
     e.preventDefault();
     e.stopPropagation();
     e.stopImmediatePropagation();
-    forceRedirect();
     return false;
 }
 
@@ -1509,7 +1497,6 @@ function preventRightClick(e) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
-        forceRedirect();
         return false;
     }
 }
