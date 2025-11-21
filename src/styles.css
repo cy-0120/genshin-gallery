@@ -67,10 +67,8 @@ body {
         radial-gradient(circle at 50% 50%, var(--color-purple-3) 0%, transparent 60%),
         linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.8) 100%),
         var(--color-bg);
-    transform-style: preserve-3d;
-    perspective: var(--perspective-base);
-    transform: perspective(var(--perspective-base)) translateZ(0);
-    transform-origin: 50% 50%; /* 기본값으로 설정 */
+    transform: scale(1);
+    transform-origin: var(--click-x, 50%) var(--click-y, 50%);
     filter: none;
     box-shadow: 0 0 0 rgba(0, 0, 0, 0);
     backface-visibility: hidden;
@@ -83,7 +81,7 @@ body {
     animation: water-wave var(--animation-duration-wave) cubic-bezier(0.4, 0, 0.2, 1) forwards;
     will-change: transform, filter;
     transform-origin: var(--click-x, 50%) var(--click-y, 50%);
-    transform: perspective(var(--perspective-base)) translateZ(0);
+    transform: scale(1);
 }
 
 .background:not(.wave) {
@@ -175,26 +173,27 @@ body {
     top: 0;
     left: 0;
     overflow: hidden;
-    transform: perspective(var(--perspective-star)) translateZ(0) rotateX(0deg);
+    transform: scale(1) rotateX(0deg);
+    transform-origin: var(--click-x, 50%) var(--click-y, 50%);
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-    will-change: transform;
+    will-change: transform, filter;
     contain: layout style paint;
 }
 
 .starfield.wave {
     animation: starfield-water-wave var(--animation-duration-wave) cubic-bezier(0.4, 0, 0.2, 1) forwards;
     transform-origin: var(--click-x, 50%) var(--click-y, 50%);
-    will-change: transform;
+    will-change: transform, filter;
     /* GPU 레이어 강제 생성 */
-    transform: perspective(var(--perspective-star)) translateZ(0) rotateX(0deg);
+    transform: scale(1) rotateX(0deg);
 }
 
 .starfield:not(.wave) {
-    will-change: auto;
+    will-change: transform, filter;
     transition: none;
     /* GPU 레이어 유지 */
-    transform: perspective(var(--perspective-star)) translateZ(0) rotateX(0deg);
+    transform: scale(1) rotateX(0deg);
 }
 
 .star {
@@ -562,63 +561,71 @@ body {
 
 @keyframes water-wave {
     0% {
-        filter: url(#wave-filter);
-        transform: perspective(var(--perspective-base)) translateZ(0);
+        filter: url(#wave-filter) brightness(1);
+        transform: scale(1);
     }
     15% {
-        filter: url(#wave-filter);
-        transform: perspective(var(--perspective-base)) translateZ(-4px);
+        filter: url(#wave-filter) brightness(1.02);
+        transform: scale(1.001);
     }
     30% {
-        filter: url(#wave-filter);
-        transform: perspective(var(--perspective-base)) translateZ(-8px);
+        filter: url(#wave-filter) brightness(1.04);
+        transform: scale(1.002);
     }
     45% {
-        filter: url(#wave-filter);
-        transform: perspective(var(--perspective-base)) translateZ(-11px);
+        filter: url(#wave-filter) brightness(1.05);
+        transform: scale(1.0025);
     }
     60% {
-        filter: url(#wave-filter);
-        transform: perspective(var(--perspective-base)) translateZ(-7px);
+        filter: url(#wave-filter) brightness(1.03);
+        transform: scale(1.0015);
     }
     75% {
-        filter: url(#wave-filter);
-        transform: perspective(var(--perspective-base)) translateZ(-3px);
+        filter: url(#wave-filter) brightness(1.015);
+        transform: scale(1.0008);
     }
     90% {
-        filter: url(#wave-filter);
-        transform: perspective(var(--perspective-base)) translateZ(-0.8px);
+        filter: url(#wave-filter) brightness(1.005);
+        transform: scale(1.0002);
     }
     100% {
         filter: none;
-        transform: perspective(var(--perspective-base)) translateZ(0);
+        transform: scale(1);
     }
 }
 
 @keyframes starfield-water-wave {
     0% {
-        transform: perspective(var(--perspective-star)) translateZ(0) rotateX(0deg);
+        filter: url(#wave-filter) brightness(1);
+        transform: scale(1) rotateX(0deg);
     }
     15% {
-        transform: perspective(var(--perspective-star)) translateZ(-2.5px) rotateX(0.35deg);
+        filter: url(#wave-filter) brightness(1.02);
+        transform: scale(1.001) rotateX(0.2deg);
     }
     30% {
-        transform: perspective(var(--perspective-star)) translateZ(-4.5px) rotateX(0.65deg);
+        filter: url(#wave-filter) brightness(1.04);
+        transform: scale(1.002) rotateX(0.4deg);
     }
     45% {
-        transform: perspective(var(--perspective-star)) translateZ(-5.5px) rotateX(0.85deg);
+        filter: url(#wave-filter) brightness(1.05);
+        transform: scale(1.0025) rotateX(0.5deg);
     }
     60% {
-        transform: perspective(var(--perspective-star)) translateZ(-3.5px) rotateX(0.5deg);
+        filter: url(#wave-filter) brightness(1.03);
+        transform: scale(1.0015) rotateX(0.3deg);
     }
     75% {
-        transform: perspective(var(--perspective-star)) translateZ(-1.5px) rotateX(0.2deg);
+        filter: url(#wave-filter) brightness(1.015);
+        transform: scale(1.0008) rotateX(0.15deg);
     }
     90% {
-        transform: perspective(var(--perspective-star)) translateZ(-0.4px) rotateX(0.08deg);
+        filter: url(#wave-filter) brightness(1.005);
+        transform: scale(1.0002) rotateX(0.05deg);
     }
     100% {
-        transform: perspective(var(--perspective-star)) translateZ(0) rotateX(0deg);
+        filter: none;
+        transform: scale(1) rotateX(0deg);
     }
 }
 

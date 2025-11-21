@@ -204,9 +204,13 @@ function createRipple(event) {
     const background = document.getElementById('background');
     const starfield = document.getElementById('starfield');
     
-    // CSS 변수로 클릭 위치 설정 
+    // CSS 변수로 클릭 위치 설정 (애니메이션 시작 전에 미리 설정)
     document.documentElement.style.setProperty('--click-x', clickXPercent + '%');
     document.documentElement.style.setProperty('--click-y', clickYPercent + '%');
+    
+    // transform-origin을 미리 설정하여 리플로우 방지 및 깜빡임 방지
+    background.style.transformOrigin = `${clickXPercent}% ${clickYPercent}%`;
+    starfield.style.transformOrigin = `${clickXPercent}% ${clickYPercent}%`;
     
     // 물결 파장 레이어 생성
     const maxDimension = Math.max(windowWidth, windowHeight);

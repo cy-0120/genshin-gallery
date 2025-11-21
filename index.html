@@ -12,10 +12,12 @@
         <defs>
             <!-- 물결 파장 효과를 위한 필터 -->
             <filter id="wave-filter" x="-50%" y="-50%" width="200%" height="200%">
-                <feTurbulence baseFrequency="0.015 0.03" numOctaves="2" seed="2" result="turbulence">
-                    <animate attributeName="baseFrequency" values="0.015 0.03;0.028 0.055;0.015 0.03" dur="1.8s" repeatCount="1"/>
+                <feTurbulence baseFrequency="0.015 0.03" numOctaves="3" seed="2" result="turbulence">
+                    <animate attributeName="baseFrequency" values="0.015 0.03;0.028 0.055;0.015 0.03" dur="2.1s" repeatCount="1"/>
                 </feTurbulence>
-                <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="6" xChannelSelector="R" yChannelSelector="G"/>
+                <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="10" xChannelSelector="R" yChannelSelector="G">
+                    <animate attributeName="scale" values="10;15;10" dur="2.1s" repeatCount="1"/>
+                </feDisplacementMap>
             </filter>
             <!-- 파장 효과를 위한 원형 필터 -->
             <filter id="ripple-wave-filter" x="-100%" y="-100%" width="300%" height="300%">
