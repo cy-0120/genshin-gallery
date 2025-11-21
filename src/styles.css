@@ -564,40 +564,24 @@ body {
         filter: url(#wave-filter) brightness(1) contrast(1);
         transform: scale(1);
     }
-    10% {
-        filter: url(#wave-filter) brightness(1.03) contrast(1.02);
-        transform: scale(1);
-    }
     20% {
-        filter: url(#wave-filter) brightness(1.06) contrast(1.04);
-        transform: scale(1);
-    }
-    30% {
-        filter: url(#wave-filter) brightness(1.08) contrast(1.06);
+        filter: url(#wave-filter) brightness(1.02) contrast(1.01);
         transform: scale(1);
     }
     40% {
-        filter: url(#wave-filter) brightness(1.1) contrast(1.08);
+        filter: url(#wave-filter) brightness(1.04) contrast(1.02);
         transform: scale(1);
     }
     50% {
-        filter: url(#wave-filter) brightness(1.12) contrast(1.1);
+        filter: url(#wave-filter) brightness(1.05) contrast(1.03);
         transform: scale(1);
     }
     60% {
-        filter: url(#wave-filter) brightness(1.08) contrast(1.06);
-        transform: scale(1);
-    }
-    70% {
-        filter: url(#wave-filter) brightness(1.05) contrast(1.03);
+        filter: url(#wave-filter) brightness(1.04) contrast(1.02);
         transform: scale(1);
     }
     80% {
         filter: url(#wave-filter) brightness(1.02) contrast(1.01);
-        transform: scale(1);
-    }
-    90% {
-        filter: url(#wave-filter) brightness(1.01) contrast(1.005);
         transform: scale(1);
     }
     100% {
@@ -611,41 +595,25 @@ body {
         filter: url(#wave-filter) brightness(1) contrast(1);
         transform: scale(1) rotateX(0deg);
     }
-    10% {
-        filter: url(#wave-filter) brightness(1.03) contrast(1.02);
-        transform: scale(1) rotateX(0.1deg);
-    }
     20% {
-        filter: url(#wave-filter) brightness(1.06) contrast(1.04);
-        transform: scale(1) rotateX(0.2deg);
-    }
-    30% {
-        filter: url(#wave-filter) brightness(1.08) contrast(1.06);
-        transform: scale(1) rotateX(0.3deg);
+        filter: url(#wave-filter) brightness(1.02) contrast(1.01);
+        transform: scale(1) rotateX(0.15deg);
     }
     40% {
-        filter: url(#wave-filter) brightness(1.1) contrast(1.08);
-        transform: scale(1) rotateX(0.35deg);
+        filter: url(#wave-filter) brightness(1.04) contrast(1.02);
+        transform: scale(1) rotateX(0.25deg);
     }
     50% {
-        filter: url(#wave-filter) brightness(1.12) contrast(1.1);
-        transform: scale(1) rotateX(0.4deg);
-    }
-    60% {
-        filter: url(#wave-filter) brightness(1.08) contrast(1.06);
+        filter: url(#wave-filter) brightness(1.05) contrast(1.03);
         transform: scale(1) rotateX(0.3deg);
     }
-    70% {
-        filter: url(#wave-filter) brightness(1.05) contrast(1.03);
-        transform: scale(1) rotateX(0.2deg);
+    60% {
+        filter: url(#wave-filter) brightness(1.04) contrast(1.02);
+        transform: scale(1) rotateX(0.25deg);
     }
     80% {
         filter: url(#wave-filter) brightness(1.02) contrast(1.01);
-        transform: scale(1) rotateX(0.1deg);
-    }
-    90% {
-        filter: url(#wave-filter) brightness(1.01) contrast(1.005);
-        transform: scale(1) rotateX(0.05deg);
+        transform: scale(1) rotateX(0.15deg);
     }
     100% {
         filter: none;
