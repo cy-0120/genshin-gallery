@@ -74,7 +74,8 @@ body {
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
     will-change: filter; /* transform 제거, filter만 사용 */
-    contain: layout style paint;
+    contain: strict; /* 페이징 처리: layout, style, paint 모두 최적화 */
+    isolation: isolate; /* 새로운 스태킹 컨텍스트 생성 */
 }
 
 .background.wave {
@@ -178,7 +179,8 @@ body {
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
     will-change: filter; /* transform 제거, filter만 사용 */
-    contain: layout style paint;
+    contain: strict; /* 페이징 처리: layout, style, paint 모두 최적화 */
+    isolation: isolate; /* 새로운 스태킹 컨텍스트 생성 */
 }
 
 .starfield.wave {
