@@ -73,15 +73,15 @@ body {
     box-shadow: 0 0 0 rgba(0, 0, 0, 0);
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-    will-change: transform, filter;
+    will-change: filter; /* transform 제거, filter만 사용 */
     contain: layout style paint;
 }
 
 .background.wave {
-    animation: water-wave var(--animation-duration-wave) cubic-bezier(0.4, 0, 0.2, 1) forwards;
-    will-change: transform, filter;
+    animation: water-wave var(--animation-duration-wave) cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    will-change: filter; /* transform 제거, filter만 사용 */
     transform-origin: var(--click-x, 50%) var(--click-y, 50%);
-    transform: scale(1);
+    transform: scale(1); /* 고정값 유지 */
 }
 
 .background:not(.wave) {
@@ -177,20 +177,20 @@ body {
     transform-origin: var(--click-x, 50%) var(--click-y, 50%);
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-    will-change: transform, filter;
+    will-change: filter; /* transform 제거, filter만 사용 */
     contain: layout style paint;
 }
 
 .starfield.wave {
-    animation: starfield-water-wave var(--animation-duration-wave) cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: starfield-water-wave var(--animation-duration-wave) cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
     transform-origin: var(--click-x, 50%) var(--click-y, 50%);
-    will-change: transform, filter;
+    will-change: filter; /* transform 제거, filter만 사용 */
     /* GPU 레이어 강제 생성 */
-    transform: scale(1) rotateX(0deg);
+    transform: scale(1) rotateX(0deg); /* 고정값 유지 */
 }
 
 .starfield:not(.wave) {
-    will-change: transform, filter;
+    will-change: filter; /* transform 제거, filter만 사용 */
     transition: none;
     /* GPU 레이어 유지 */
     transform: scale(1) rotateX(0deg);
@@ -561,32 +561,44 @@ body {
 
 @keyframes water-wave {
     0% {
-        filter: url(#wave-filter) brightness(1);
+        filter: url(#wave-filter) brightness(1) contrast(1);
         transform: scale(1);
     }
-    15% {
-        filter: url(#wave-filter) brightness(1.02);
-        transform: scale(1.001);
+    10% {
+        filter: url(#wave-filter) brightness(1.03) contrast(1.02);
+        transform: scale(1);
+    }
+    20% {
+        filter: url(#wave-filter) brightness(1.06) contrast(1.04);
+        transform: scale(1);
     }
     30% {
-        filter: url(#wave-filter) brightness(1.04);
-        transform: scale(1.002);
+        filter: url(#wave-filter) brightness(1.08) contrast(1.06);
+        transform: scale(1);
     }
-    45% {
-        filter: url(#wave-filter) brightness(1.05);
-        transform: scale(1.0025);
+    40% {
+        filter: url(#wave-filter) brightness(1.1) contrast(1.08);
+        transform: scale(1);
+    }
+    50% {
+        filter: url(#wave-filter) brightness(1.12) contrast(1.1);
+        transform: scale(1);
     }
     60% {
-        filter: url(#wave-filter) brightness(1.03);
-        transform: scale(1.0015);
+        filter: url(#wave-filter) brightness(1.08) contrast(1.06);
+        transform: scale(1);
     }
-    75% {
-        filter: url(#wave-filter) brightness(1.015);
-        transform: scale(1.0008);
+    70% {
+        filter: url(#wave-filter) brightness(1.05) contrast(1.03);
+        transform: scale(1);
+    }
+    80% {
+        filter: url(#wave-filter) brightness(1.02) contrast(1.01);
+        transform: scale(1);
     }
     90% {
-        filter: url(#wave-filter) brightness(1.005);
-        transform: scale(1.0002);
+        filter: url(#wave-filter) brightness(1.01) contrast(1.005);
+        transform: scale(1);
     }
     100% {
         filter: none;
@@ -596,32 +608,44 @@ body {
 
 @keyframes starfield-water-wave {
     0% {
-        filter: url(#wave-filter) brightness(1);
+        filter: url(#wave-filter) brightness(1) contrast(1);
         transform: scale(1) rotateX(0deg);
     }
-    15% {
-        filter: url(#wave-filter) brightness(1.02);
-        transform: scale(1.001) rotateX(0.2deg);
+    10% {
+        filter: url(#wave-filter) brightness(1.03) contrast(1.02);
+        transform: scale(1) rotateX(0.1deg);
+    }
+    20% {
+        filter: url(#wave-filter) brightness(1.06) contrast(1.04);
+        transform: scale(1) rotateX(0.2deg);
     }
     30% {
-        filter: url(#wave-filter) brightness(1.04);
-        transform: scale(1.002) rotateX(0.4deg);
+        filter: url(#wave-filter) brightness(1.08) contrast(1.06);
+        transform: scale(1) rotateX(0.3deg);
     }
-    45% {
-        filter: url(#wave-filter) brightness(1.05);
-        transform: scale(1.0025) rotateX(0.5deg);
+    40% {
+        filter: url(#wave-filter) brightness(1.1) contrast(1.08);
+        transform: scale(1) rotateX(0.35deg);
+    }
+    50% {
+        filter: url(#wave-filter) brightness(1.12) contrast(1.1);
+        transform: scale(1) rotateX(0.4deg);
     }
     60% {
-        filter: url(#wave-filter) brightness(1.03);
-        transform: scale(1.0015) rotateX(0.3deg);
+        filter: url(#wave-filter) brightness(1.08) contrast(1.06);
+        transform: scale(1) rotateX(0.3deg);
     }
-    75% {
-        filter: url(#wave-filter) brightness(1.015);
-        transform: scale(1.0008) rotateX(0.15deg);
+    70% {
+        filter: url(#wave-filter) brightness(1.05) contrast(1.03);
+        transform: scale(1) rotateX(0.2deg);
+    }
+    80% {
+        filter: url(#wave-filter) brightness(1.02) contrast(1.01);
+        transform: scale(1) rotateX(0.1deg);
     }
     90% {
-        filter: url(#wave-filter) brightness(1.005);
-        transform: scale(1.0002) rotateX(0.05deg);
+        filter: url(#wave-filter) brightness(1.01) contrast(1.005);
+        transform: scale(1) rotateX(0.05deg);
     }
     100% {
         filter: none;
