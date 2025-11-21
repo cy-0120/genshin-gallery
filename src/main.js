@@ -276,22 +276,11 @@ function createRipple(event) {
                 performanceMonitor.update();
             }
             
-            // 적응형 체크 간격 사용
-            const adaptiveInterval = performanceMonitor.getInterval();
-            if (currentTime - lastCheckTime >= adaptiveInterval) {
-                const progress = elapsed / totalDuration;
-                const currentRadius = maxRadius * progress;
-                // 체크 빈도 증가: FPS 조건 완화
-                const shouldCheck = performanceMonitor.fps >= 25 || frameSkipCount % 2 === 0;
-                if (shouldCheck) {
-                    checkStarsInRipple(x, y, currentRadius, maxRadius);
-                    frameSkipCount = 0;
-                } else {
-                    frameSkipCount++;
-                }
-                
-                lastCheckTime = currentTime;
-            }
+            // 매 프레임마다 체크 (프레임 스킵 제거)
+            const progress = elapsed / totalDuration;
+            const currentRadius = maxRadius * progress;
+            // 모든 프레임에서 체크 부드러운 애니메이션
+            checkStarsInRipple(x, y, currentRadius, maxRadius);
             
             animationFrameId = requestAnimationFrame(animateSparkle);
         } else {
